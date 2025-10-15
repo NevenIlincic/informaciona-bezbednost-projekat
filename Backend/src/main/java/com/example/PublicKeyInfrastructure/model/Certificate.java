@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "certificates")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +19,7 @@ public class Certificate {
     private Integer id;
 
     @Column(name = "type")
+    @Enumerated(EnumType.STRING)
     private CertificateType type;
     @Column(name = "certificate_pem")
     private String certificatePem;
@@ -46,13 +48,13 @@ public class Certificate {
     private String subjectCommonName;
     @Column(name = "subject_organization")
     private String subjectOrganization;
-    @Column(name = "subject_organization_unit")
-    private String subjectOrganizationUnit;
+    @Column(name = "subject_organizational_unit")
+    private String subjectOrganizationalUnit;
     @Column(name = "subject_country")
     private String subjectCountry;
     @Column(name = "subject_email")
     private String subjectEmail;
-    @Column(name = "issuer_data")
+    @Column(name = "issuer_data", columnDefinition = "jsonb")
     private String issuerData;
     @Column(name = "public_key_pem")
     private String publicKeyPem;

@@ -36,6 +36,7 @@ public class AuthenticatedUser {
     private Organization organization;
 
     @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column(name = "is_active")
