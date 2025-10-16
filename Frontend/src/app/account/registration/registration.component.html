@@ -1,0 +1,61 @@
+<div class="auth-container">
+  <div class="auth-box">
+    <h2 class="auth-title">Register</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First name</label>
+          <input type="text" formControlName="firstName" />
+          <div *ngIf="isInvalid('firstName')" class="error">Required</div>
+        </div>
+
+        <div class="form-group">
+          <label>Last name</label>
+          <input type="text" formControlName="lastName" />
+          <div *ngIf="isInvalid('lastName')" class="error">Required</div>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email" />
+          <div *ngIf="isInvalid('email')" class="error">Invalid email</div>
+        </div>
+
+        <div class="form-group">
+          <label>Organization</label>
+          <select formControlName="organization">
+            <option value="">Select organization</option>
+            <option value="Org1">Org 1</option>
+            <option value="Org2">Org 2</option>
+            <option value="Org3">Org 3</option>
+          </select>
+          <div *ngIf="isInvalid('organization')" class="error">Required</div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" formControlName="password" />
+          <div *ngIf="registerForm.get('password')?.hasError('weakPassword')" class="error">
+            Must include upper, lower, number, and symbol.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Repeat password</label>
+          <input type="password" formControlName="repeatPassword" />
+          <div *ngIf="registerForm.hasError('notMatching')" class="error">
+            Passwords don't match.
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="registerForm.invalid">Register</button>
+
+      <div class="auth-footer">
+        <p>Already have an account?</p>
+        <button [routerLink]="[ '/', 'login' ]" class="btn-secondary">Back to Login</button>
+      </div>
+    </form>
+  </div>
+</div>

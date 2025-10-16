@@ -1,1 +1,100 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+:root {
+  --font-family: 'Roboto', sans-serif;
+
+  /* Boje */
+  --color-bg: #f7f8fa;
+  --color-text: #333;
+  --color-primary: #6b73ff;
+  --color-primary-hover: #000dff;
+  --color-secondary: #ffffff;
+  --color-secondary-border: #6b73ff;
+  --color-error: #ff3b3b;
+
+  /* Dimenzije i ostalo */
+  --border-radius: 8px;
+  --transition: 0.3s ease;
+}
+
+/* ===== 🌐 GLOBAL BASE STYLES ===== */
+html, body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== 🧩 FORM ELEMENTS ===== */
+.input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 5px rgba(107, 115, 255, 0.3);
+}
+
+/* ===== 🏷️ LABELS ===== */
+.label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ===== ⚠️ ERROR MESSAGES ===== */
+.error-text {
+  color: var(--color-error);
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+
+/* ===== 🧭 TITLES ===== */
+.title {
+  color: var(--color-text);
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* ===== 🔵 PRIMARY BUTTON ===== */
+.btn-primary {
+  width: 100%;
+  background-color: var(--color-primary);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 0.7rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* ===== ⚪ SECONDARY BUTTON ===== */
+.btn-secondary {
+  background: none;
+  border: 1px solid var(--color-secondary-border);
+  color: var(--color-secondary-border);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
