@@ -1,5 +1,6 @@
 package com.example.PublicKeyInfrastructure.authentication;
 
+import com.example.PublicKeyInfrastructure.model.AuthenticatedUser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtTokenProvider {
@@ -41,6 +43,22 @@ public class JwtTokenProvider {
                 .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
+
+    public String generateTokenFromUser(AuthenticatedUser user) {
+        String username = user.getEmail();
+        String role = user.getRole().toString();
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("role", role)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(secretKey, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
 
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
