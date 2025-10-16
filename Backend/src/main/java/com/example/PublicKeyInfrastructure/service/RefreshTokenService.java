@@ -35,4 +35,11 @@ public class RefreshTokenService {
     private RefreshToken findRefreshTokenByUser(AuthenticatedUser user){
         return refreshTokenRepository.findRefreshTokenByUser(user).orElse(null);
     }
+
+    public void revokeRefreshToken(String email){
+        AuthenticatedUser foundUser = authenticatedUserService.findUserByEmail(email);
+        RefreshToken refreshToken = findRefreshTokenByUser(foundUser);
+        refreshToken.setValid(false);
+        refreshTokenRepository.save(refreshToken);
+    }
 }

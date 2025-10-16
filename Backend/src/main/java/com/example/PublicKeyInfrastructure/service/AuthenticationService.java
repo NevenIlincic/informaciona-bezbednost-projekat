@@ -3,6 +3,7 @@ package com.example.PublicKeyInfrastructure.service;
 import com.example.PublicKeyInfrastructure.authentication.JwtTokenProvider;
 import com.example.PublicKeyInfrastructure.authentication.TokenResponse;
 import com.example.PublicKeyInfrastructure.dto.login.LoginDTO;
+import com.example.PublicKeyInfrastructure.dto.login.LogoutDTO;
 import com.example.PublicKeyInfrastructure.model.RefreshToken;
 import com.example.PublicKeyInfrastructure.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,9 @@ public class AuthenticationService {
         String accessToken = jwtTokenProvider.generateToken(authentication);
 
         return new TokenResponse(accessToken, refreshToken.getToken());
+    }
+
+    public void logout(LogoutDTO logoutDTO) {
+        refreshTokenService.revokeRefreshToken(logoutDTO.getEmail());
     }
 }
