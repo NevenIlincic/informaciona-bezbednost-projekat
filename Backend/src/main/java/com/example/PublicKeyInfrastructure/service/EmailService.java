@@ -1,5 +1,6 @@
 package com.example.PublicKeyInfrastructure.service;
 
+import com.example.PublicKeyInfrastructure.utils.AESUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ public class EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private AESUtil aesUtil;
 
     public void sendEmail(String to, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -23,7 +26,8 @@ public class EmailService {
     }
 
     public void sendActivationEmail(String recipientEmail, String token) {
-        String activationLink = "http://localhost:8080" + "/activate?token=" + token;
+        String encryptedToken = aesUtil.encrypt(token);
+        String activationLink = "https://localhost:8080" + "/activate?token=" + encryptedToken;
         String subject = "Activate Your Account";
         String message = "<p>Click the link below to activate your account:</p>"
                 + "<p><a href=\"" + activationLink + "\">Activate Account</a></p>"
