@@ -42,4 +42,8 @@ public class RefreshTokenService {
         refreshToken.setValid(false);
         refreshTokenRepository.save(refreshToken);
     }
+
+    public RefreshToken findRefreshTokenByToken(String token){
+        return refreshTokenRepository.findByToken(token).orElse(null);
+    }
 }

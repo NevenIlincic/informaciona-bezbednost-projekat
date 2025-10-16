@@ -4,14 +4,16 @@ import com.example.PublicKeyInfrastructure.authentication.JwtTokenProvider;
 import com.example.PublicKeyInfrastructure.authentication.TokenResponse;
 import com.example.PublicKeyInfrastructure.dto.login.LoginDTO;
 import com.example.PublicKeyInfrastructure.dto.login.LogoutDTO;
+import com.example.PublicKeyInfrastructure.dto.token.RefreshTokenDTO;
 import com.example.PublicKeyInfrastructure.model.RefreshToken;
-import com.example.PublicKeyInfrastructure.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class AuthenticationService {
@@ -23,15 +25,20 @@ public class AuthenticationService {
     @Autowired
     private RefreshTokenService refreshTokenService;
 
-    public TokenResponse login(LoginDTO loginDTO) {
+    private Authentication returnAuthentication(String email, String password){
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginDTO.getEmail(),
-                        loginDTO.getPassword()
+                        email,
+                        password
                 )
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        return authentication;
+    }
+
+    public TokenResponse login(LoginDTO loginDTO) {
+        Authentication authentication = returnAuthentication(loginDTO.getEmail(), loginDTO.getPassword());
+
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(loginDTO.getEmail());
         String accessToken = jwtTokenProvider.generateToken(authentication);
 
@@ -40,5 +47,14 @@ public class AuthenticationService {
 
     public void logout(LogoutDTO logoutDTO) {
         refreshTokenService.revokeRefreshToken(logoutDTO.getEmail());
+    }
+
+    public TokenResponse createNewAccessToken(RefreshTokenDTO refreshTokenDTO) throws IllegalArgumentException {
+        RefreshToken foundToken = refreshTokenService.findRefreshTokenByToken(refreshTokenDTO.getRefreshToken());
+        if (foundToken.getExpiryDate().isBefore(LocalDateTime.now()) || !foundToken.isValid()){
+            throw new IllegalArgumentException("Refresh token expired or is invalid!");
+        }
+        String accessToken = jwtTokenProvider.generateTokenFromUser(foundToken.getUser());
+        return new TokenResponse(accessToken, foundToken.getToken());
     }
 }
