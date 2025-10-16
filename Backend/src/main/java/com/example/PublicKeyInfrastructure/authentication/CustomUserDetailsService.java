@@ -20,12 +20,20 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserDetails userDetails = authenticatedUserRepository.findByEmail(email)
-                .map(user -> new org.springframework.security.core.userdetails.User(
-                        user.getEmail(),
-                        user.getPassword(),
-                        user.getAuthorities().stream().map(role -> new SimpleGrantedAuthority(  role.toString())).collect(Collectors.toList())
-                ))
+                .map(user -> {
+                    if (!user.getIsActive()) { // dodato: proverava da li je korisnik aktiviran
+                        throw new UsernameNotFoundException("User account is not activated: " + email);
+                    }
+                    return new org.springframework.security.core.userdetails.User(
+                            user.getEmail(),
+                            user.getPassword(),
+                            user.getAuthorities().stream()
+                                    .map(role -> new SimpleGrantedAuthority(role.toString()))
+                                    .collect(Collectors.toList())
+                    );
+                })
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
 
         // Dodaj logovanje za debagovanje
         System.out.println("User found: " + userDetails.getPassword());
