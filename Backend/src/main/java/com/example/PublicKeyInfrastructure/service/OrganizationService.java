@@ -14,4 +14,8 @@ public class OrganizationService {
     public Organization findOrganizationById(int id){
         return organizationRepository.findById(id).get();
     }
+
+    public Organization findOrganizationByName(String name){
+        return organizationRepository.findOrganizationByName(name).orElse(null);
+    }
 }

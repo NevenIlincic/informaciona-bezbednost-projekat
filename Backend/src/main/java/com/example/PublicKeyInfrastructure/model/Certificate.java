@@ -4,8 +4,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
+
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
 @Table(name = "certificates")
@@ -54,8 +59,9 @@ public class Certificate {
     private String subjectCountry;
     @Column(name = "subject_email")
     private String subjectEmail;
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "issuer_data", columnDefinition = "jsonb")
-    private String issuerData;
+    private Map<String, Object> issuerData;
     @Column(name = "public_key_pem")
     private String publicKeyPem;
     @Column(name = "csr_pem")
