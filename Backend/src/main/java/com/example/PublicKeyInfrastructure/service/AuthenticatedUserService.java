@@ -5,7 +5,7 @@ import com.example.PublicKeyInfrastructure.model.AuthenticatedUser;
 import com.example.PublicKeyInfrastructure.model.Organization;
 import com.example.PublicKeyInfrastructure.model.Role;
 import com.example.PublicKeyInfrastructure.repository.AuthenticatedUserRepository;
-import com.example.PublicKeyInfrastructure.utils.AESUtil;
+import com.example.PublicKeyInfrastructure.utils.AESUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class AuthenticatedUserService {
     private PasswordEncoder passwordEncoder;
     @Autowired EmailService emailService;
     @Autowired
-    private AESUtil aesUtil;
+    private AESUtils aesUtils;
 
     public AuthenticatedUser createUser(CreateAuthenticatedUserDTO userToCreate) {
         Organization foundOrganization = organizationService.findOrganizationById(userToCreate.getOrganization().getId());
@@ -49,7 +49,7 @@ public class AuthenticatedUserService {
     }
 
     public AuthenticatedUser activateAccount(String tokenEncrypted) {
-        String token = aesUtil.decrypt(tokenEncrypted);
+        String token = aesUtils.decrypt(tokenEncrypted);
         AuthenticatedUser userToActivate = findUserByActivationToken(token);
         if (userToActivate.getTokenExpiry().isBefore(LocalDateTime.now())) {
             return null;
