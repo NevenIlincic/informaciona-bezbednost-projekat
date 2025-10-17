@@ -26,9 +26,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class CertificateUtils {
@@ -177,5 +175,16 @@ public class CertificateUtils {
 
         pemBuilder.append("-----END CERTIFICATE-----\n");
         return pemBuilder.toString();
+    }
+
+    public List<X509Certificate> createCertificateChain(Certificate createdCertficate){
+        List<X509Certificate> certList = new ArrayList<>();
+        while (createdCertficate != null) {
+            X509Certificate createdX509Certificate = pemToX509Certificate(createdCertficate.getCertificatePem());
+            certList.add(createdX509Certificate);
+            createdCertficate = createdCertficate.getIssuerCertificate();
+        }
+        return certList;
+
     }
 }

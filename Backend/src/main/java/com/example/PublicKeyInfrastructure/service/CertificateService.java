@@ -25,10 +25,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CertificateService {
@@ -151,7 +148,7 @@ public class CertificateService {
             certificate.setPublicKeyPem(publicKeyPem);
             certificate.setCertificatePem(certificatePEM);
 
-            createPKCS12File(certificateX509, eecertificateDTO.getPasswordForCertificate(), privateKey);
+            createPKCS12File(certificate, eecertificateDTO.getPasswordForCertificate(), privateKey);
 
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -249,13 +246,14 @@ public class CertificateService {
         return certificate;
     }
 
-    private void createPKCS12File(X509Certificate createdCertificate, String password, PrivateKey privateKey){
+    private void createPKCS12File(Certificate createdCertificate, String password, PrivateKey privateKey) {
         try {
             KeyStore pkcs12 = KeyStore.getInstance("PKCS12");
-            java.security.cert.Certificate[] chain = new java.security.cert.Certificate[] { createdCertificate };
+            List<X509Certificate> chainList = certificateUtils.createCertificateChain(createdCertificate);
+            java.security.cert.Certificate[] chain = chainList.toArray(new java.security.cert.Certificate[0]);
 
             pkcs12.load(null, null);
-            pkcs12.setKeyEntry("user-key", privateKey, password.toCharArray(), chain );
+            pkcs12.setKeyEntry("user-key", privateKey, password.toCharArray(), chain);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             pkcs12.store(baos, password.toCharArray());
@@ -270,7 +268,7 @@ public class CertificateService {
             helper.addAttachment("user_cert.p12", new ByteArrayResource(p12Bytes));
 
             mailSender.send(message);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
