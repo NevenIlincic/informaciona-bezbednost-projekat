@@ -61,7 +61,7 @@ public class Certificate {
     private String subjectEmail;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "issuer_data", columnDefinition = "jsonb")
-    private Map<String, Object> issuerData;
+    private Map<String, String> issuerData;
     @Column(name = "public_key_pem")
     private String publicKeyPem;
     @Column(name = "csr_pem")

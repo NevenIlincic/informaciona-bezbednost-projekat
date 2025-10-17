@@ -1,6 +1,7 @@
 package com.example.PublicKeyInfrastructure.utils;
 
 import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
+import com.example.PublicKeyInfrastructure.dto.certificate.X509CertificateCreationDTO;
 import com.example.PublicKeyInfrastructure.model.Certificate;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
@@ -41,7 +42,7 @@ public class CertificateUtils {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public X509Certificate generateCertificate(CertificateDTO certificateDTO, PublicKey publicKey, PrivateKey issuerPrivateKey, Map<String, String> issuerData, LocalDateTime validFrom, LocalDateTime validTo){
+    public X509Certificate generateCertificate(X509CertificateCreationDTO certificateDTO, PublicKey publicKey, PrivateKey issuerPrivateKey, Map<String, String> issuerData, LocalDateTime validFrom, LocalDateTime validTo, boolean isCACertificate){
         try {
             X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
                     .addRDN(BCStyle.CN, certificateDTO.getSubjectCommonName())
@@ -64,7 +65,7 @@ public class CertificateUtils {
             }
 
             Date notBefore = dateUtils.convertToDate(validFrom.getDayOfMonth(), validFrom.getMonthValue(), validFrom.getYear());
-            Date notAfter = dateUtils.convertToDate(validTo.getDayOfMonth(), validFrom.getMonthValue(), validFrom.getYear());
+            Date notAfter = dateUtils.convertToDate(validTo.getDayOfMonth(), validTo.getMonthValue(), validTo.getYear());
             X509Certificate certificate = createCertificate(
                     publicKey,
                     issuerPrivateKey,
@@ -72,7 +73,8 @@ public class CertificateUtils {
                     issuer,
                     notBefore,
                     notAfter,
-                    new BigInteger(certificateDTO.getSerialNumber())
+                    new BigInteger(certificateDTO.getSerialNumber()),
+                    isCACertificate
 
 
             );
@@ -97,7 +99,8 @@ public class CertificateUtils {
                                                     X500Name issuer,
                                                     Date notBefore,
                                                     Date notAfter,
-                                                    BigInteger serialNumber) throws Exception {
+                                                    BigInteger serialNumber,
+                                              boolean isCACertificate) throws Exception {
 
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuer,
@@ -111,13 +114,13 @@ public class CertificateUtils {
         // Dodavanje ekstenzija
         certBuilder.addExtension(
                 Extension.basicConstraints,
-                true, // critical
-                new BasicConstraints(true) // true = CA, false = end-entity
+                false, // critical
+                new BasicConstraints(isCACertificate) // true = CA, false = end-entity
         );
 
         certBuilder.addExtension(
                 Extension.keyUsage,
-                true,
+                false,
                 new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment)
         );
 
@@ -136,19 +139,24 @@ public class CertificateUtils {
                 .getCertificate(certBuilder.build(signer));
     }
 
-    public X509Certificate pemToX509Certificate(String pem) throws Exception {
-        // Ukloni zaglavlja i razmake iz PEM-a
-        String sanitized = pem
-                .replace("-----BEGIN CERTIFICATE-----", "")
-                .replace("-----END CERTIFICATE-----", "")
-                .replaceAll("\\s", "");
+    public X509Certificate pemToX509Certificate(String pem) {
+        try {
+            // Ukloni zaglavlja i razmake iz PEM-a
+            String sanitized = pem
+                    .replace("-----BEGIN CERTIFICATE-----", "")
+                    .replace("-----END CERTIFICATE-----", "")
+                    .replaceAll("\\s", "");
 
-        // Dekoduj Base64
-        byte[] certBytes = Base64.getDecoder().decode(sanitized);
+            // Dekoduj Base64
+            byte[] certBytes = Base64.getDecoder().decode(sanitized);
 
-        // Napravi CertificateFactory i generiši X509Certificate
-        CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(certBytes));
+            // Napravi CertificateFactory i generiši X509Certificate
+            CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(certBytes));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     public String convertToPem(X509Certificate certificate) throws Exception {

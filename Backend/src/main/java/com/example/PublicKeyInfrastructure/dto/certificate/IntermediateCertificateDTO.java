@@ -9,8 +9,9 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CertificateDTO {
+public class IntermediateCertificateDTO {
 
+    private int issuerCertificateId;
     private String subjectCommonName;
     private String subjectOrganizationName;
     private String subjectOrganizationalUnit;
