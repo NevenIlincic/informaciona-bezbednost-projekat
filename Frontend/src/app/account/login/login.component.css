@@ -1,0 +1,114 @@
+/* Centriranje forme po širini i visini */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #6b73ff, #000dff);
+}
+
+/* Kartica forme */
+.login-box {
+  background-color: #fff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  width: 320px;
+  text-align: center;
+}
+
+/* Naslov */
+.login-box h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+/* Polja forme */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #6b73ff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(107, 115, 255, 0.3);
+}
+
+/* Greška */
+.error-message {
+  color: #ff3b3b;
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+/* Dugme za login */
+.login-btn {
+  width: 100%;
+  background-color: #6b73ff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  background-color: #000dff;
+}
+
+/* Sekcija za register */
+.register-section {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.register-section span {
+  color: #555;
+}
+
+.register-btn {
+  background: none;
+  border: 1px solid #6b73ff;
+  color: #6b73ff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.register-btn:hover {
+  background-color: #6b73ff;
+  color: white;
+}
+
+.success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+}

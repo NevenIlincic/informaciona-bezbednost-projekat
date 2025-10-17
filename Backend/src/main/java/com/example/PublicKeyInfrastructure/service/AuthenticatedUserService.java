@@ -54,6 +54,9 @@ public class AuthenticatedUserService {
         if (userToActivate.getTokenExpiry().isBefore(LocalDateTime.now())) {
             return null;
         }
+        if (userToActivate.getIsActive()) {
+            return null;
+        }
         userToActivate.setIsActive(true);
         authenticatedUserRepository.save(userToActivate);
         return userToActivate;
