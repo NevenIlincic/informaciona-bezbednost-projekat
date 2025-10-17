@@ -1,6 +1,7 @@
 package com.example.PublicKeyInfrastructure.controller;
 
 import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
+import com.example.PublicKeyInfrastructure.dto.certificate.EECertificateDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.IntermediateCertificateDTO;
 import com.example.PublicKeyInfrastructure.model.AdminMasterKey;
 import com.example.PublicKeyInfrastructure.service.AdminMasterKeyService;
@@ -35,6 +36,12 @@ public class CertificateController {
     @PostMapping(value = "/intermediate", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createIntermediateCertificate(@RequestBody IntermediateCertificateDTO intermediateCertificateDTO){
         certificateService.createIntermediateCertificate(intermediateCertificateDTO);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/end-entity", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createEndEntityCertificate(@RequestBody EECertificateDTO eeCertificateDTO){
+        certificateService.createEndEntityCertificate(eeCertificateDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

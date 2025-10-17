@@ -1,18 +1,26 @@
 package com.example.PublicKeyInfrastructure.service;
 
 import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
+import com.example.PublicKeyInfrastructure.dto.certificate.EECertificateDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.IntermediateCertificateDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.X509CertificateCreationDTO;
 import com.example.PublicKeyInfrastructure.model.*;
 import com.example.PublicKeyInfrastructure.repository.CertificateRepository;
 import com.example.PublicKeyInfrastructure.utils.AESUtils;
 import com.example.PublicKeyInfrastructure.utils.CertificateUtils;
+import com.example.PublicKeyInfrastructure.utils.CertificateValidator;
 import com.example.PublicKeyInfrastructure.utils.RSAUtils;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.security.KeyPair;
+import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -38,6 +46,11 @@ public class CertificateService {
     private AESUtils aesUtils;
     @Autowired
     private RSAUtils rsaUtils;
+
+    @Autowired
+    private JavaMailSender mailSender;
+    @Autowired
+    private CertificateValidator certificateValidator;
 
     public Certificate createRootCertificate(CertificateDTO certificateDTO){
 
@@ -66,25 +79,8 @@ public class CertificateService {
 
     public Certificate createIntermediateCertificate(IntermediateCertificateDTO intermediateCertificateDTO){
         Certificate issuerCertificate = findCertificateById(intermediateCertificateDTO.getIssuerCertificateId());
+        certificateValidator.validateCertificateChain(issuerCertificate);
         Certificate certificate = setCertificateAttributes(intermediateCertificateDTO, issuerCertificate);
-        X509Certificate issuerX509Certificate = certificateUtils.pemToX509Certificate(issuerCertificate.getCertificatePem());
-        Date now = new Date();
-        if (issuerX509Certificate.getBasicConstraints() == -1){
-            throw new IllegalArgumentException("Certificate is not CA!");
-        }
-        if (now.before(issuerX509Certificate.getNotBefore()) || now.after(issuerX509Certificate.getNotAfter())){
-            throw new IllegalArgumentException("Certificate has expired!");
-        }
-        if (issuerCertificate.getIsRevoked()){
-            throw new IllegalArgumentException("Certificate is revoked!");
-        }
-        PublicKey issuerPublicKey = rsaUtils.generatePublicKey(issuerCertificate.getPublicKeyPem());
-        try{
-            issuerX509Certificate.verify(issuerPublicKey);
-            System.out.println("VALIDAN POTPIS!");
-        }catch (Exception e){
-            System.out.println("NEVALIDAN POTPIS!");
-        }
         PrivateKey issuerPrivateKey = null;
         if (issuerCertificate.getType() == CertificateType.ROOT){
             AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();
@@ -92,7 +88,10 @@ public class CertificateService {
             byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), adminMasterKeyDecrypted);
             issuerPrivateKey = rsaUtils.generatePrivateKey(issuerPrivateKeyDecrypted);
         }else{
-            ///
+            String issuerOrganizationMasterKeyEncrypted = issuerCertificate.getOrganization().getMasterKeyEncrypted();
+            String issuerOrganizationMasterKeyDecrypted = aesUtils.decrypt(issuerOrganizationMasterKeyEncrypted);
+            byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), issuerOrganizationMasterKeyDecrypted);
+            issuerPrivateKey = rsaUtils.generatePrivateKey(issuerPrivateKeyDecrypted);
         }
 
         String organizationMasterKeyEncrypted = certificate.getOrganization().getMasterKeyEncrypted();
@@ -112,7 +111,7 @@ public class CertificateService {
             String certificatePEM = certificateUtils.convertToPem(certificateX509);
             certificate.setPublicKeyPem(publicKeyPem);
             certificate.setCertificatePem(certificatePEM);
-            
+
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -120,6 +119,45 @@ public class CertificateService {
 
 
         return certificateRepository.save(certificate);
+    }
+
+    public Certificate createEndEntityCertificate(EECertificateDTO eecertificateDTO){
+        Certificate issuerCertificate = findCertificateById(eecertificateDTO.getIssuerCertificateId());
+        certificateValidator.validateCertificateChain(issuerCertificate);
+        Certificate certificate = setCertificateAttributes(eecertificateDTO, issuerCertificate);
+        PrivateKey issuerPrivateKey = null;
+        if (issuerCertificate.getType() == CertificateType.ROOT){
+            AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();
+            String adminMasterKeyDecrypted = aesUtils.decrypt(adminMasterKey.getMasterKey());
+            byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), adminMasterKeyDecrypted);
+            issuerPrivateKey = rsaUtils.generatePrivateKey(issuerPrivateKeyDecrypted);
+        }else{
+            String issuerOrganizationMasterKeyEncrypted = issuerCertificate.getOrganization().getMasterKeyEncrypted();
+            String issuerOrganizationMasterKeyDecrypted = aesUtils.decrypt(issuerOrganizationMasterKeyEncrypted);
+            byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), issuerOrganizationMasterKeyDecrypted);
+            issuerPrivateKey = rsaUtils.generatePrivateKey(issuerPrivateKeyDecrypted);
+        }
+        try {
+            KeyPair keyPair = certificateUtils.generateKeyPair();
+            PublicKey publicKey = keyPair.getPublic();
+            String publicKeyPem = "-----BEGIN PUBLIC KEY-----\n" +
+                    Base64.getEncoder().encodeToString(publicKey.getEncoded()) +
+                    "\n-----END PUBLIC KEY-----";
+            PrivateKey privateKey = keyPair.getPrivate();
+            certificate.setPrivateKey(null);
+            X509CertificateCreationDTO x509CertificateCreationDTO = new X509CertificateCreationDTO(eecertificateDTO);
+            X509Certificate certificateX509 = certificateUtils.generateCertificate(x509CertificateCreationDTO, publicKey, issuerPrivateKey, certificate.getIssuerData(), eecertificateDTO.getValidFrom(), eecertificateDTO.getValidTo(), false);
+            String certificatePEM = certificateUtils.convertToPem(certificateX509);
+            certificate.setPublicKeyPem(publicKeyPem);
+            certificate.setCertificatePem(certificatePEM);
+
+            createPKCS12File(certificateX509, eecertificateDTO.getPasswordForCertificate(), privateKey);
+
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return certificateRepository.save(certificate);
+
     }
 
     public Certificate findCertificateById(int id){
@@ -180,6 +218,60 @@ public class CertificateService {
             certificate.setSubjectCountry(intermediateCertificateDTO.getSubjectCountry());
             certificate.setSerialNumber(intermediateCertificateDTO.getSerialNumber());
         }
+        if (dto instanceof EECertificateDTO){
+            EECertificateDTO eecertificateDTO = (EECertificateDTO) dto;
+            Map<String, String> issuerData = new HashMap<>();
+            issuerData.put("SubjectCommonName", issuerCertificate.getSubjectCommonName());
+            issuerData.put("SubjectOrganizationName", issuerCertificate.getSubjectOrganization());
+            issuerData.put("SubjectOrganizationalUnit", issuerCertificate.getSubjectOrganizationalUnit());
+            issuerData.put("SubjectCountry", issuerCertificate.getSubjectCountry());
+            issuerData.put("SubjectEmail", issuerCertificate.getSubjectEmail());
+            certificate.setOrganization(null);
+            certificate.setIssuerData(issuerData);
+            certificate.setCsrPem(null);
+            certificate.setIsRevoked(false);
+            certificate.setRevocationDate(null);
+            certificate.setRevocationReason(null);
+            certificate.setType(CertificateType.END_ENTITY);
+            AuthenticatedUser user = authenticatedUserService.findUserByEmail(eecertificateDTO.getSubjectEmail());
+            certificate.setCAuser(user);
+            certificate.setIssuerCertificate(issuerCertificate);
+            certificate.setValidFrom(eecertificateDTO.getValidFrom());
+            certificate.setValidTo(eecertificateDTO.getValidTo());
+            certificate.setSubjectCommonName(eecertificateDTO.getSubjectCommonName());
+            certificate.setSubjectOrganization(null);
+            certificate.setSubjectOrganizationalUnit(null);
+            certificate.setSubjectEmail(eecertificateDTO.getSubjectEmail());
+            certificate.setSubjectCountry(eecertificateDTO.getSubjectCountry());
+            certificate.setSerialNumber(eecertificateDTO.getSerialNumber());
+
+        }
         return certificate;
+    }
+
+    private void createPKCS12File(X509Certificate createdCertificate, String password, PrivateKey privateKey){
+        try {
+            KeyStore pkcs12 = KeyStore.getInstance("PKCS12");
+            java.security.cert.Certificate[] chain = new java.security.cert.Certificate[] { createdCertificate };
+
+            pkcs12.load(null, null);
+            pkcs12.setKeyEntry("user-key", privateKey, password.toCharArray(), chain );
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            pkcs12.store(baos, password.toCharArray());
+            byte[] p12Bytes = baos.toByteArray();
+            String userEmail = "nevenilincic@gmail.com";
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true); // true = multipart
+            helper.setTo(userEmail);
+            helper.setSubject("Vaš PKCS#12 sertifikat");
+            helper.setText("U prilogu se nalazi vaš PKCS#12 sertifikat. Lozinka je: " + password);
+            helper.addAttachment("user_cert.p12", new ByteArrayResource(p12Bytes));
+
+            mailSender.send(message);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }

@@ -32,4 +32,13 @@ public class X509CertificateCreationDTO {
         this.subjectEmail = certificateDTO.getSubjectEmail();
         this.serialNumber = certificateDTO.getSerialNumber();
     }
+    public X509CertificateCreationDTO(EECertificateDTO eeCertificateDTO) {
+        this.subjectCommonName = eeCertificateDTO.getSubjectCommonName();
+        this.subjectOrganizationName = eeCertificateDTO.getSubjectOrganizationName();
+        this.subjectOrganizationalUnit = eeCertificateDTO.getSubjectOrganizationalUnit();
+        this.subjectCountry = eeCertificateDTO.getSubjectCountry();
+        this.subjectEmail = eeCertificateDTO.getSubjectEmail();
+        this.serialNumber = eeCertificateDTO.getSerialNumber();
+    }
+
 }
