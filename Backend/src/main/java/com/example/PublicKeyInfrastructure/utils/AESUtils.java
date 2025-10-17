@@ -1,8 +1,10 @@
 package com.example.PublicKeyInfrastructure.utils;
 
+import com.example.PublicKeyInfrastructure.model.AdminMasterKey;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
@@ -137,4 +139,18 @@ public class AESUtils {
         secureRandom.nextBytes(iv);
         return iv;
     }
+
+    public String generateMasterKey(){
+        try {
+            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+            keyGenerator.init(256);
+            SecretKey masterKey = keyGenerator.generateKey();
+            String masterKeyBase64 = Base64.getEncoder().encodeToString(masterKey.getEncoded());
+            return masterKeyBase64;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
 }

@@ -5,6 +5,7 @@ import com.example.PublicKeyInfrastructure.model.Certificate;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
@@ -23,8 +24,10 @@ import java.security.*;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class CertificateUtils {
@@ -38,9 +41,8 @@ public class CertificateUtils {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public X509Certificate generateCertificate(CertificateDTO certificateDTO){
+    public X509Certificate generateCertificate(CertificateDTO certificateDTO, PublicKey publicKey, PrivateKey issuerPrivateKey, Map<String, String> issuerData, LocalDateTime validFrom, LocalDateTime validTo){
         try {
-            KeyPair generatedKeys = generateKeyPair();
             X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
                     .addRDN(BCStyle.CN, certificateDTO.getSubjectCommonName())
                     .addRDN(BCStyle.O, certificateDTO.getSubjectOrganizationName())
@@ -48,16 +50,26 @@ public class CertificateUtils {
                     .addRDN(BCStyle.C, certificateDTO.getSubjectCountry())
                     .addRDN(BCStyle.E, certificateDTO.getSubjectEmail())
                     .build();
-//            X509Certificate issuerCertificate = pemToX509Certificate(pem);
-//            X500Name issuer = new JcaX509CertificateHolder(issuerCertificate).getIssuer();
+            X500Name issuer;
+            if (issuerData == null) {
+                issuer = subject;
+            }else{
+                issuer = new X500NameBuilder(BCStyle.INSTANCE)
+                        .addRDN(BCStyle.CN, issuerData.get("SubjectCommonName"))
+                        .addRDN(BCStyle.O, issuerData.get("SubjectOrganizationName"))
+                        .addRDN(BCStyle.OU, issuerData.get("SubjectOrganizationalUnit"))
+                        .addRDN(BCStyle.C, issuerData.get("SubjectCountry"))
+                        .addRDN(BCStyle.E, issuerData.get("SubjectEmail"))
+                        .build();
+            }
 
-            Date notBefore = dateUtils.convertToDate(10, 2, 2025);
-            Date notAfter = dateUtils.convertToDate(10, 12, 2025);
+            Date notBefore = dateUtils.convertToDate(validFrom.getDayOfMonth(), validFrom.getMonthValue(), validFrom.getYear());
+            Date notAfter = dateUtils.convertToDate(validTo.getDayOfMonth(), validFrom.getMonthValue(), validFrom.getYear());
             X509Certificate certificate = createCertificate(
-                    generatedKeys,
-                    generatedKeys.getPrivate(),
+                    publicKey,
+                    issuerPrivateKey,
                     subject,
-                    subject,
+                    issuer,
                     notBefore,
                     notAfter,
                     new BigInteger(certificateDTO.getSerialNumber())
@@ -72,14 +84,14 @@ public class CertificateUtils {
     }
 
     // Generiše par ključeva za sertifikat
-    private KeyPair generateKeyPair() throws NoSuchAlgorithmException {
+    public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(2048);
         return keyGen.generateKeyPair();
     }
 
     // Kreiranje X.509 sertifikata
-    private X509Certificate createCertificate(KeyPair certKeyPair,
+    private X509Certificate createCertificate(PublicKey publicKey,
                                                     PrivateKey issuerPrivateKey,
                                                     X500Name subject,
                                                     X500Name issuer,
@@ -93,7 +105,26 @@ public class CertificateUtils {
                 notBefore,
                 notAfter,
                 subject,
-                certKeyPair.getPublic()
+                publicKey
+        );
+
+        // Dodavanje ekstenzija
+        certBuilder.addExtension(
+                Extension.basicConstraints,
+                true, // critical
+                new BasicConstraints(true) // true = CA, false = end-entity
+        );
+
+        certBuilder.addExtension(
+                Extension.keyUsage,
+                true,
+                new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment)
+        );
+
+        certBuilder.addExtension(
+                Extension.extendedKeyUsage,
+                false,
+                new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth)
         );
 
         // Potpisivanje sertifikata privatnim ključem izdavaoca
