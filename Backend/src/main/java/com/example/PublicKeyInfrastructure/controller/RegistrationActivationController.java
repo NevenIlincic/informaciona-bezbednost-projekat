@@ -19,9 +19,9 @@ public class RegistrationActivationController {
     public RedirectView registrationActivation(@RequestParam("token") String token) {
         AuthenticatedUser activatedUser = authenticatedUserService.activateAccount(token);
         if (activatedUser == null){
-            return new RedirectView("/"); // Stranica za isteknuti token!!
+            return new RedirectView("https://localhost:4200/activation-failure"); // Stranica za isteknuti token!!
         }else{
-            return new RedirectView("https://www.google.com"); // Stranica za uspesnu aktivaciju!
+            return new RedirectView("https://localhost:4200/activation-success"); // Stranica za uspesnu aktivaciju!
         }
     }
 }

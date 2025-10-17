@@ -25,10 +25,8 @@
         <div class="form-group">
           <label>Organization</label>
           <select formControlName="organization">
-            <option value="">Select organization</option>
-            <option value="Org1">Org 1</option>
-            <option value="Org2">Org 2</option>
-            <option value="Org3">Org 3</option>
+            <option value="" disabled selected>Select organization</option>
+            <option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</option>
           </select>
           <div *ngIf="isInvalid('organization')" class="error">Required</div>
         </div>

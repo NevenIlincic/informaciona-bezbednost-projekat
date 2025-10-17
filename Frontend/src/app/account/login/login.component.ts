@@ -1,42 +1,55 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import {RouterLink} from '@angular/router';
+import {RouterLink, Router} from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AuthService } from '../auth.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
   standalone: true, // <--- ovo je važno u standalone pristupu
-  imports: [CommonModule, ReactiveFormsModule, RouterLink], // <-- dodato ovde
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatSnackBarModule, HttpClientModule], // <-- dodato ovde
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  errorMessage: string | null = null;
+  isSubmitting = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private snackBar: MatSnackBar
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
+      password: ['', Validators.required],
     });
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
+    if (this.loginForm.invalid) return;
 
-      if (email === 'test@example.com' && password === '1234') {
-        this.errorMessage = null;
-        alert('Login successful!');
-      } else {
-        this.errorMessage = 'Invalid email or password.';
+    this.isSubmitting = true;
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.snackBar.open('Login successful! Redirecting...', 'Close', {
+          duration: 2500,
+          panelClass: ['success-snackbar']
+        });
+        this.router.navigate(['/home']);
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.snackBar.open('Invalid email or password.', 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
-    } else {
-      this.errorMessage = 'Please fill in all required fields.';
-    }
-  }
-
-  onRegister(): void {
-    alert('Redirect to register page');
+    });
   }
 }

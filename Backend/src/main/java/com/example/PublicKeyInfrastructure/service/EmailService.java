@@ -23,7 +23,7 @@ public class EmailService {
     }
 
     public void sendActivationEmail(String recipientEmail, String token) {
-        String activationLink = "http://localhost:8080" + "/activate?token=" + token;
+        String activationLink = "https://localhost:8080" + "/activate?token=" + token;
         String subject = "Activate Your Account";
         String message = "<p>Click the link below to activate your account:</p>"
                 + "<p><a href=\"" + activationLink + "\">Activate Account</a></p>"
