@@ -118,7 +118,8 @@ public class CertificateService {
         return certificateRepository.save(certificate);
     }
 
-    public Certificate createEndEntityCertificate(EECertificateDTO eecertificateDTO){
+    public byte[] createEndEntityCertificate(EECertificateDTO eecertificateDTO, boolean isAdminCreating) throws IllegalArgumentException{
+        byte[] pcks12Bytes = new byte[0];
         Certificate issuerCertificate = findCertificateById(eecertificateDTO.getIssuerCertificateId());
         certificateValidator.validateCertificateChain(issuerCertificate);
         Certificate certificate = setCertificateAttributes(eecertificateDTO, issuerCertificate);
@@ -147,14 +148,18 @@ public class CertificateService {
             String certificatePEM = certificateUtils.convertToPem(certificateX509);
             certificate.setPublicKeyPem(publicKeyPem);
             certificate.setCertificatePem(certificatePEM);
+            certificate.setSerialNumber(x509CertificateCreationDTO.getSerialNumber().toString());
 
-            createPKCS12File(certificate, eecertificateDTO.getPasswordForCertificate(), privateKey);
+
+            if(!isAdminCreating) {
+                pcks12Bytes = createPKCS12File(certificate, eecertificateDTO.getPasswordForCertificate(), privateKey);
+            }
 
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
-        return certificateRepository.save(certificate);
-
+        certificateRepository.save(certificate);
+        return pcks12Bytes;
     }
 
     public Certificate findCertificateById(int id){
@@ -223,7 +228,8 @@ public class CertificateService {
             issuerData.put("SubjectOrganizationalUnit", issuerCertificate.getSubjectOrganizationalUnit());
             issuerData.put("SubjectCountry", issuerCertificate.getSubjectCountry());
             issuerData.put("SubjectEmail", issuerCertificate.getSubjectEmail());
-            certificate.setOrganization(null);
+            Organization organization = organizationService.findOrganizationByName(eecertificateDTO.getSubjectOrganizationName());
+            certificate.setOrganization(organization);
             certificate.setIssuerData(issuerData);
             certificate.setCsrPem(null);
             certificate.setIsRevoked(false);
@@ -236,17 +242,17 @@ public class CertificateService {
             certificate.setValidFrom(eecertificateDTO.getValidFrom());
             certificate.setValidTo(eecertificateDTO.getValidTo());
             certificate.setSubjectCommonName(eecertificateDTO.getSubjectCommonName());
-            certificate.setSubjectOrganization(null);
-            certificate.setSubjectOrganizationalUnit(null);
+            certificate.setSubjectOrganization(eecertificateDTO.getSubjectOrganizationName());
+            certificate.setSubjectOrganizationalUnit(eecertificateDTO.getSubjectOrganizationalUnit());
             certificate.setSubjectEmail(eecertificateDTO.getSubjectEmail());
             certificate.setSubjectCountry(eecertificateDTO.getSubjectCountry());
-            certificate.setSerialNumber(eecertificateDTO.getSerialNumber());
+            certificate.setSerialNumber("");
 
         }
         return certificate;
     }
 
-    private void createPKCS12File(Certificate createdCertificate, String password, PrivateKey privateKey) {
+    private byte[] createPKCS12File(Certificate createdCertificate, String password, PrivateKey privateKey) {
         try {
             KeyStore pkcs12 = KeyStore.getInstance("PKCS12");
             List<X509Certificate> chainList = certificateUtils.createCertificateChain(createdCertificate);
@@ -258,18 +264,15 @@ public class CertificateService {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             pkcs12.store(baos, password.toCharArray());
             byte[] p12Bytes = baos.toByteArray();
-            String userEmail = "nevenilincic@gmail.com";
 
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true); // true = multipart
-            helper.setTo(userEmail);
-            helper.setSubject("Vaš PKCS#12 sertifikat");
-            helper.setText("U prilogu se nalazi vaš PKCS#12 sertifikat. Lozinka je: " + password);
-            helper.addAttachment("user_cert.p12", new ByteArrayResource(p12Bytes));
-
-            mailSender.send(message);
+            return p12Bytes;
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        return "123".getBytes();
+    }
+
+    public List<Certificate> findNonRevokedCACertificates(){
+        return this.certificateRepository.returnNonRevokedCertificates(CertificateType.INTERMEDIATE);
     }
 }
