@@ -180,6 +180,7 @@ public class CertificateUtils {
     public List<X509Certificate> createCertificateChain(Certificate createdCertficate){
         List<X509Certificate> certList = new ArrayList<>();
         while (createdCertficate != null) {
+            System.out.println(createdCertficate.getType().toString());
             X509Certificate createdX509Certificate = pemToX509Certificate(createdCertficate.getCertificatePem());
             certList.add(createdX509Certificate);
             createdCertficate = createdCertficate.getIssuerCertificate();

@@ -1,9 +1,6 @@
 package com.example.PublicKeyInfrastructure.controller;
 
-import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
-import com.example.PublicKeyInfrastructure.dto.certificate.EECertificateDTO;
-import com.example.PublicKeyInfrastructure.dto.certificate.IntermediateCertificateDTO;
-import com.example.PublicKeyInfrastructure.dto.certificate.NonRevokedCACertificateDTO;
+import com.example.PublicKeyInfrastructure.dto.certificate.*;
 import com.example.PublicKeyInfrastructure.model.AdminMasterKey;
 import com.example.PublicKeyInfrastructure.model.Certificate;
 import com.example.PublicKeyInfrastructure.service.AdminMasterKeyService;
@@ -16,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -45,9 +43,12 @@ public class CertificateController {
     }
 
     @PostMapping(value = "/end-entity", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createEndEntityCertificate(@RequestBody EECertificateDTO eeCertificateDTO){
-        certificateService.createEndEntityCertificate(eeCertificateDTO);
-        return new ResponseEntity<>(eeCertificateDTO,HttpStatus.CREATED);
+    public ResponseEntity<?> createEndEntityCertificate(@RequestBody EECertificateDTO eeCertificateDTO, @RequestParam(value = "isAdminCreating") boolean isAdminCreating){
+
+        byte[] pcks12bytes = certificateService.createEndEntityCertificate(eeCertificateDTO, isAdminCreating );
+        String encoded =  Base64.getEncoder().encodeToString(pcks12bytes);
+        Pcks12DTO pcks12DTO = new Pcks12DTO(encoded, "End_Entity_Certificate");
+        return new ResponseEntity<>(pcks12DTO,HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/intermediate", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -60,6 +61,8 @@ public class CertificateController {
 
         return new ResponseEntity<>(nonRevokedCACertificateDTOList, HttpStatus.OK);
     }
+
+
 
     private void saveMasterKey(){
         String masterKey = aesUtils.generateMasterKey();

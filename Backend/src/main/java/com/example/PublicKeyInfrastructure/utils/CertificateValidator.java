@@ -1,6 +1,7 @@
 package com.example.PublicKeyInfrastructure.utils;
 
 import com.example.PublicKeyInfrastructure.model.Certificate;
+import com.example.PublicKeyInfrastructure.model.CertificateType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,9 +18,11 @@ public class CertificateValidator {
     private RSAUtils rsaUtils;
 
     public boolean validateCertificateChain(Certificate issuerCertificate) {
-        while (issuerCertificate.getIssuerCertificate() != null) {
+      //issuerCertificate.getIssuerCertificate() != null
+        while (issuerCertificate != null) {
             X509Certificate issuerX509Certificate = certificateUtils.pemToX509Certificate(issuerCertificate.getCertificatePem());
             Date now = new Date();
+
             if (issuerX509Certificate.getBasicConstraints() == -1) {
                 throw new IllegalArgumentException("Certificate is not CA!");
             }
@@ -42,7 +45,7 @@ public class CertificateValidator {
                 throw new IllegalArgumentException("Digital sign is invalid!");
             }
 
-            System.out.println("SERTIFIKAT VALIDAN ID: " + issuerCertificate.getId().toString());
+            System.out.println("SERTIFIKAT VALIDAN TIP: " + issuerCertificate.getType().toString());
             issuerCertificate = issuerCertificate.getIssuerCertificate();
         }
 

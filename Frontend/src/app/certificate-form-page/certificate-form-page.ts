@@ -4,6 +4,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { CertificateService } from './certificate-service';
 import { EECertificateDTO } from '../../dto/certificate/EECertificateDTO';
 import { NonRevokedCACertificateDTO } from '../../dto/certificate/NonRevokedCACertificateDTO';
+import { Pcks12DTO } from '../../dto/certificate/Pcks12DTO';
 
 @Component({
   selector: 'app-certificate-form-page',
@@ -16,8 +17,8 @@ export class CertificateFormPage implements OnInit {
   nonRevokedCACertificates: NonRevokedCACertificateDTO[] = [];
   selectedCACertificate: NonRevokedCACertificateDTO | null = null;
   isSubmitting = false;
- 
-  constructor(private formBuilder: FormBuilder, private certificateService: CertificateService){
+
+  constructor(private formBuilder: FormBuilder, private certificateService: CertificateService) {
     this.loginForm = formBuilder.group({
       subjectCommonName: ['', Validators.required],
       subjectEmail: ['', Validators.required],
@@ -40,11 +41,11 @@ export class CertificateFormPage implements OnInit {
   }
 
 
-  onSubmit(){
+  onSubmit() {
     console.log(this.loginForm.get('certificateValidFrom')?.value);
-    if (this.loginForm.invalid) {return;}
+    if (this.loginForm.invalid) { return; }
     this.isSubmitting = true;
-    this.selectedCACertificate =  this.loginForm.get("foundCACertificates")?.value;
+    this.selectedCACertificate = this.loginForm.get("foundCACertificates")?.value;
 
     const eeCertificateDTO: EECertificateDTO = {
       issuerCertificateId: this.selectedCACertificate!.id,
@@ -57,14 +58,31 @@ export class CertificateFormPage implements OnInit {
       validFrom: this.loginForm.get('certificateValidFrom')?.value,
       validTo: this.loginForm.get('certificateValidTo')?.value,
     }
-    
-    this.certificateService.createEECertificate(eeCertificateDTO).subscribe({
-      next: () =>{
-        console.log("OVDE");
-        
+
+    this.certificateService.createEECertificateRegularUser(eeCertificateDTO).subscribe({
+      next: (pcksDTO: Pcks12DTO) => {
+        // Decode Base64 u binarni array
+        const binary = atob(pcksDTO.encodedPcks12);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+
+        // Kreiramo Blob i URL za download
+        const blob = new Blob([bytes], { type: 'application/x-pkcs12' });
+        const url = window.URL.createObjectURL(blob);
+
+        // Automatski download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = pcksDTO.fileName;
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+
       }
     });
-    
+
 
   }
 }
