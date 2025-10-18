@@ -1,9 +1,8 @@
 package com.example.PublicKeyInfrastructure.controller;
 
-import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
-import com.example.PublicKeyInfrastructure.dto.certificate.EECertificateDTO;
-import com.example.PublicKeyInfrastructure.dto.certificate.IntermediateCertificateDTO;
+import com.example.PublicKeyInfrastructure.dto.certificate.*;
 import com.example.PublicKeyInfrastructure.model.AdminMasterKey;
+import com.example.PublicKeyInfrastructure.model.Certificate;
 import com.example.PublicKeyInfrastructure.service.AdminMasterKeyService;
 import com.example.PublicKeyInfrastructure.service.CertificateService;
 import com.example.PublicKeyInfrastructure.utils.AESUtils;
@@ -12,6 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/certificates")
@@ -39,11 +42,29 @@ public class CertificateController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/end-entity", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createEndEntityCertificate(@RequestBody EECertificateDTO eeCertificateDTO){
-        certificateService.createEndEntityCertificate(eeCertificateDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @PostMapping(value = "/end-entity", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createEndEntityCertificate(@RequestBody EECertificateDTO eeCertificateDTO, @RequestParam(value = "isAdminCreating") boolean isAdminCreating){
+        try{
+            byte[] pcks12bytes = certificateService.createEndEntityCertificate(eeCertificateDTO, isAdminCreating );
+            String encoded =  Base64.getEncoder().encodeToString(pcks12bytes);
+            Pcks12DTO pcks12DTO = new Pcks12DTO(encoded, "End_Entity_Certificate");
+            return new ResponseEntity<>(pcks12DTO,HttpStatus.CREATED);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(new Pcks12DTO("Invalid", "Invalid"),HttpStatus.BAD_REQUEST);
+        }
     }
+
+    @GetMapping(value = "/intermediate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<NonRevokedCACertificateDTO>> getNonRevokedCACertificates(){
+        List<Certificate> foundCertificates = certificateService.findNonRevokedCACertificates();
+        List<NonRevokedCACertificateDTO> nonRevokedCACertificateDTOList = new ArrayList<>();
+        for (Certificate certificate : foundCertificates) {
+            nonRevokedCACertificateDTOList.add(new NonRevokedCACertificateDTO(certificate));
+        }
+
+        return new ResponseEntity<>(nonRevokedCACertificateDTOList, HttpStatus.OK);
+    }
+
 
 
     private void saveMasterKey(){

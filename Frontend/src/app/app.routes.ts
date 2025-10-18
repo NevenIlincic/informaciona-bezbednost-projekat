@@ -4,6 +4,7 @@ import { RegistrationComponent } from './account/registration/registration.compo
 import { ActivationSuccessComponent } from './account/activation-success/activation-success.component';
 import { ActivationFailureComponent } from './account/activation-failure/activation-failure.component';
 import { HomeComponent } from './home/home/home.component';
+import { CertificateFormPage } from './certificate-form-page/certificate-form-page';
 
 
 export const routes: Routes = [
@@ -13,5 +14,6 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'activation-success', component: ActivationSuccessComponent },
   { path: 'activation-failure', component: ActivationFailureComponent },
+  { path: 'certificate-form-page', component: CertificateFormPage}
 ];
 

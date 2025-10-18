@@ -1,5 +1,6 @@
 package com.example.PublicKeyInfrastructure.authentication;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,6 +49,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     }
                 } catch (IllegalArgumentException e) {
                     //   logger.warn("Unable to get JWT Token.");
+                } catch (ExpiredJwtException e) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired");
+                    return;
                 }
             } else {
                 // logger.warn("JWT Token does not exist.");
