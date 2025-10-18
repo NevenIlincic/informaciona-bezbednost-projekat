@@ -17,7 +17,7 @@ public class CertificateValidator {
     @Autowired
     private RSAUtils rsaUtils;
 
-    public boolean validateCertificateChain(Certificate issuerCertificate) {
+    public boolean validateCertificateChain(Certificate issuerCertificate) throws IllegalArgumentException{
       //issuerCertificate.getIssuerCertificate() != null
         while (issuerCertificate != null) {
             X509Certificate issuerX509Certificate = certificateUtils.pemToX509Certificate(issuerCertificate.getCertificatePem());

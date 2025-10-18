@@ -117,7 +117,7 @@ public class CertificateUtils {
                 new BasicConstraints(isCACertificate) // true = CA, false = end-entity
         );
 
-        if (keyConstraints.isKeyEncipherment() || keyConstraints.isDigitalSignature()){
+        if (keyConstraints != null && (keyConstraints.isKeyEncipherment() || keyConstraints.isDigitalSignature())){
             certBuilder = setKeyConstraints(certBuilder, keyConstraints);
         }
 

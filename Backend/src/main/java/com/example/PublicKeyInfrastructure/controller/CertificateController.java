@@ -44,11 +44,14 @@ public class CertificateController {
 
     @PostMapping(value = "/end-entity", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createEndEntityCertificate(@RequestBody EECertificateDTO eeCertificateDTO, @RequestParam(value = "isAdminCreating") boolean isAdminCreating){
-
-        byte[] pcks12bytes = certificateService.createEndEntityCertificate(eeCertificateDTO, isAdminCreating );
-        String encoded =  Base64.getEncoder().encodeToString(pcks12bytes);
-        Pcks12DTO pcks12DTO = new Pcks12DTO(encoded, "End_Entity_Certificate");
-        return new ResponseEntity<>(pcks12DTO,HttpStatus.CREATED);
+        try{
+            byte[] pcks12bytes = certificateService.createEndEntityCertificate(eeCertificateDTO, isAdminCreating );
+            String encoded =  Base64.getEncoder().encodeToString(pcks12bytes);
+            Pcks12DTO pcks12DTO = new Pcks12DTO(encoded, "End_Entity_Certificate");
+            return new ResponseEntity<>(pcks12DTO,HttpStatus.CREATED);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(new Pcks12DTO("Invalid", "Invalid"),HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping(value = "/intermediate", produces = MediaType.APPLICATION_JSON_VALUE)

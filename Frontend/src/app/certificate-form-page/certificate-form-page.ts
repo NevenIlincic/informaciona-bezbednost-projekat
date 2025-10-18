@@ -5,6 +5,8 @@ import { CertificateService } from './certificate-service';
 import { EECertificateDTO } from '../../dto/certificate/EECertificateDTO';
 import { NonRevokedCACertificateDTO } from '../../dto/certificate/NonRevokedCACertificateDTO';
 import { Pcks12DTO } from '../../dto/certificate/Pcks12DTO';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-certificate-form-page',
@@ -18,7 +20,7 @@ export class CertificateFormPage implements OnInit {
   selectedCACertificate: NonRevokedCACertificateDTO | null = null;
   isSubmitting = false;
 
-  constructor(private formBuilder: FormBuilder, private certificateService: CertificateService) {
+  constructor(private formBuilder: FormBuilder, private certificateService: CertificateService, private snackBar: MatSnackBar) {
     this.loginForm = formBuilder.group({
       subjectCommonName: ['', Validators.required],
       subjectEmail: ['', Validators.required],
@@ -84,7 +86,21 @@ export class CertificateFormPage implements OnInit {
         a.click();
 
         window.URL.revokeObjectURL(url);
+        this.isSubmitting = false;
 
+      },
+      error: (err: HttpErrorResponse) => {
+        if (err.status == 400) {
+          const errorDTO: Pcks12DTO = err.error;
+          if (errorDTO.encodedPcks12 == "Invalid") {
+            this.isSubmitting = false;
+            this.snackBar.open('Issuer certificate is invalid!', 'I Understand', {
+              duration: undefined,
+              verticalPosition: 'bottom',
+              panelClass: ["snack-bar-refresh-token-error"]
+            });
+          }
+        }
       }
     });
 

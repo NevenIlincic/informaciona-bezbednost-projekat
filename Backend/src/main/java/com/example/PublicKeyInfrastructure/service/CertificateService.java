@@ -109,8 +109,6 @@ public class CertificateService {
             certificate.setPublicKeyPem(publicKeyPem);
             certificate.setCertificatePem(certificatePEM);
 
-            createPKCS12File(certificate, "123", privateKey);
-
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -120,7 +118,7 @@ public class CertificateService {
         return certificateRepository.save(certificate);
     }
 
-    public byte[] createEndEntityCertificate(EECertificateDTO eecertificateDTO, boolean isAdminCreating){
+    public byte[] createEndEntityCertificate(EECertificateDTO eecertificateDTO, boolean isAdminCreating) throws IllegalArgumentException{
         byte[] pcks12Bytes = new byte[0];
         Certificate issuerCertificate = findCertificateById(eecertificateDTO.getIssuerCertificateId());
         certificateValidator.validateCertificateChain(issuerCertificate);
