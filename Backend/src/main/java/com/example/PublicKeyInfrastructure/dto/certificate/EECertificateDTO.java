@@ -18,7 +18,6 @@ public class EECertificateDTO {
     private String subjectOrganizationalUnit;
     private String subjectCountry;
     private String subjectEmail;
-    private String serialNumber;
     private LocalDateTime validFrom;
     private LocalDateTime validTo;
 }

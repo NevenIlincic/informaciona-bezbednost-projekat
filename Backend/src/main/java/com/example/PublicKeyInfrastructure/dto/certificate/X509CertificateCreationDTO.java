@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,7 +16,7 @@ public class X509CertificateCreationDTO {
     private String subjectOrganizationalUnit;
     private String subjectCountry;
     private String subjectEmail;
-    private String serialNumber;
+    private BigInteger serialNumber;
 
     public X509CertificateCreationDTO(CertificateDTO certificateDTO) {
         this.subjectCommonName = certificateDTO.getSubjectCommonName();
@@ -21,7 +24,7 @@ public class X509CertificateCreationDTO {
         this.subjectOrganizationalUnit = certificateDTO.getSubjectOrganizationalUnit();
         this.subjectCountry = certificateDTO.getSubjectCountry();
         this.subjectEmail = certificateDTO.getSubjectEmail();
-        this.serialNumber = certificateDTO.getSerialNumber();
+        this.serialNumber = new BigInteger(certificateDTO.getSerialNumber());
     }
 
     public X509CertificateCreationDTO(IntermediateCertificateDTO certificateDTO) {
@@ -30,7 +33,7 @@ public class X509CertificateCreationDTO {
         this.subjectOrganizationalUnit = certificateDTO.getSubjectOrganizationalUnit();
         this.subjectCountry = certificateDTO.getSubjectCountry();
         this.subjectEmail = certificateDTO.getSubjectEmail();
-        this.serialNumber = certificateDTO.getSerialNumber();
+        this.serialNumber = new BigInteger(certificateDTO.getSerialNumber());
     }
     public X509CertificateCreationDTO(EECertificateDTO eeCertificateDTO) {
         this.subjectCommonName = eeCertificateDTO.getSubjectCommonName();
@@ -38,7 +41,9 @@ public class X509CertificateCreationDTO {
         this.subjectOrganizationalUnit = eeCertificateDTO.getSubjectOrganizationalUnit();
         this.subjectCountry = eeCertificateDTO.getSubjectCountry();
         this.subjectEmail = eeCertificateDTO.getSubjectEmail();
-        this.serialNumber = eeCertificateDTO.getSerialNumber();
+        SecureRandom random = new SecureRandom();
+        // 64-bit random broj, dovoljno za jedinstvenost
+        this.serialNumber = new BigInteger(64, random);
     }
 
 }

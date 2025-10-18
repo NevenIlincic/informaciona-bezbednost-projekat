@@ -147,6 +147,7 @@ public class CertificateService {
             String certificatePEM = certificateUtils.convertToPem(certificateX509);
             certificate.setPublicKeyPem(publicKeyPem);
             certificate.setCertificatePem(certificatePEM);
+            certificate.setSerialNumber(x509CertificateCreationDTO.getSerialNumber().toString());
 
             createPKCS12File(certificate, eecertificateDTO.getPasswordForCertificate(), privateKey);
 
@@ -240,7 +241,7 @@ public class CertificateService {
             certificate.setSubjectOrganizationalUnit(null);
             certificate.setSubjectEmail(eecertificateDTO.getSubjectEmail());
             certificate.setSubjectCountry(eecertificateDTO.getSubjectCountry());
-            certificate.setSerialNumber(eecertificateDTO.getSerialNumber());
+            certificate.setSerialNumber("");
 
         }
         return certificate;
@@ -271,5 +272,9 @@ public class CertificateService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public List<Certificate> findNonRevokedCACertificates(){
+        return this.certificateRepository.returnNonRevokedCertificates(CertificateType.INTERMEDIATE);
     }
 }

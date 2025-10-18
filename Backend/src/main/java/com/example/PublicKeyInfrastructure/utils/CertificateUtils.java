@@ -71,7 +71,7 @@ public class CertificateUtils {
                     issuer,
                     notBefore,
                     notAfter,
-                    new BigInteger(certificateDTO.getSerialNumber()),
+                    certificateDTO.getSerialNumber(),
                     isCACertificate
 
 

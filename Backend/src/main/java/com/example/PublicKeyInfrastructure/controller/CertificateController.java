@@ -3,7 +3,9 @@ package com.example.PublicKeyInfrastructure.controller;
 import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.EECertificateDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.IntermediateCertificateDTO;
+import com.example.PublicKeyInfrastructure.dto.certificate.NonRevokedCACertificateDTO;
 import com.example.PublicKeyInfrastructure.model.AdminMasterKey;
+import com.example.PublicKeyInfrastructure.model.Certificate;
 import com.example.PublicKeyInfrastructure.service.AdminMasterKeyService;
 import com.example.PublicKeyInfrastructure.service.CertificateService;
 import com.example.PublicKeyInfrastructure.utils.AESUtils;
@@ -12,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/certificates")
@@ -45,6 +50,16 @@ public class CertificateController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @GetMapping(value = "/intermediate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<NonRevokedCACertificateDTO>> getNonRevokedCACertificates(){
+        List<Certificate> foundCertificates = certificateService.findNonRevokedCACertificates();
+        List<NonRevokedCACertificateDTO> nonRevokedCACertificateDTOList = new ArrayList<>();
+        for (Certificate certificate : foundCertificates) {
+            nonRevokedCACertificateDTOList.add(new NonRevokedCACertificateDTO(certificate));
+        }
+
+        return new ResponseEntity<>(nonRevokedCACertificateDTOList, HttpStatus.OK);
+    }
 
     private void saveMasterKey(){
         String masterKey = aesUtils.generateMasterKey();
