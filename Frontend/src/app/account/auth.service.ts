@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, skip, tap } from 'rxjs/operators';
 import {JwtHelperService} from '@auth0/angular-jwt';
+import { RefreshTokenDTO } from '../../dto/authentication/RefreshTokenDTO';
 
 export interface TokenResponse {
   accessToken: string;
@@ -51,6 +52,11 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem('accessToken');
+  }
+
+  refreshToken(refreshToken: RefreshTokenDTO): Observable<TokenResponse>{
+    return this.http.post<TokenResponse>(this.apiUrl + "/refresh", refreshToken,{headers: {skip: 'true'}});
+
   }
 
   

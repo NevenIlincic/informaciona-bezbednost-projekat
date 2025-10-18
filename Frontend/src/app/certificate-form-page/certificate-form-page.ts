@@ -35,18 +35,19 @@ export class CertificateFormPage implements OnInit {
     this.certificateService.getNonRevokedCACertificates().subscribe({
       next: (certificateList: NonRevokedCACertificateDTO[]) => {
         this.nonRevokedCACertificates = certificateList;
-        console.log(this.nonRevokedCACertificates);
       }
     });
   }
 
 
   onSubmit(){
+    console.log(this.loginForm.get('certificateValidFrom')?.value);
     if (this.loginForm.invalid) {return;}
     this.isSubmitting = true;
+    this.selectedCACertificate =  this.loginForm.get("foundCACertificates")?.value;
 
     const eeCertificateDTO: EECertificateDTO = {
-      issuerCertificateId: 30,
+      issuerCertificateId: this.selectedCACertificate!.id,
       passwordForCertificate: this.loginForm.get('certificatePassword')?.value,
       subjectCommonName: this.loginForm.get('subjectCommonName')?.value,
       subjectCountry: this.loginForm.get('subjectCountry')?.value,
@@ -56,6 +57,14 @@ export class CertificateFormPage implements OnInit {
       validFrom: this.loginForm.get('certificateValidFrom')?.value,
       validTo: this.loginForm.get('certificateValidTo')?.value,
     }
+    
+    this.certificateService.createEECertificate(eeCertificateDTO).subscribe({
+      next: () =>{
+        console.log("OVDE");
+        
+      }
+    });
+    
 
   }
 }

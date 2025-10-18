@@ -50,6 +50,7 @@ public class AuthenticationService {
     }
 
     public TokenResponse createNewAccessToken(RefreshTokenDTO refreshTokenDTO) throws IllegalArgumentException {
+        System.out.println("TOKEN: " + refreshTokenDTO.getRefreshToken());
         RefreshToken foundToken = refreshTokenService.findRefreshTokenByToken(refreshTokenDTO.getRefreshToken());
         if (foundToken.getExpiryDate().isBefore(LocalDateTime.now()) || !foundToken.isValid()){
             throw new IllegalArgumentException("Refresh token expired or is invalid!");

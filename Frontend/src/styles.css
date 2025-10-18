@@ -98,3 +98,17 @@ html, body {
   background-color: var(--color-primary);
   color: white;
 }
+
+
+.snack-bar-refresh-token-error {
+  background-color: #cf352a;
+  color: rgb(211, 198, 198);
+  font-weight: bold;
+  opacity: 1;
+}
+/* Stil dugmeta OK unutar snackBar-a */
+.snack-bar-refresh-token-error .mat-simple-snackbar-action {
+  color: rgb(94, 13, 12);         /* boja dugmeta */
+  font-weight: bold;      /* podebljan tekst */
+  border-radius: 5px;
+}

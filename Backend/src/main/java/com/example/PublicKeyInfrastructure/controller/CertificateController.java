@@ -44,10 +44,10 @@ public class CertificateController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/end-entity", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/end-entity", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createEndEntityCertificate(@RequestBody EECertificateDTO eeCertificateDTO){
         certificateService.createEndEntityCertificate(eeCertificateDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(eeCertificateDTO,HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/intermediate", produces = MediaType.APPLICATION_JSON_VALUE)
