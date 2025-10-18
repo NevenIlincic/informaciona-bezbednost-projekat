@@ -160,7 +160,6 @@ public class CertificateService {
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
-        certificateValidator.validateCertificateChain(certificate);
         certificateRepository.save(certificate);
         return pcks12Bytes;
     }
@@ -268,16 +267,6 @@ public class CertificateService {
             pkcs12.store(baos, password.toCharArray());
             byte[] p12Bytes = baos.toByteArray();
 
-            String userEmail = "nevenilincic@gmail.com";
-
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true); // true = multipart
-            helper.setTo(userEmail);
-            helper.setSubject("Vaš PKCS#12 sertifikat");
-            helper.setText("U prilogu se nalazi vaš PKCS#12 sertifikat. Lozinka je: " + password);
-            helper.addAttachment("user_cert.p12", new ByteArrayResource(p12Bytes));
-
-            mailSender.send(message);
             return p12Bytes;
         } catch (Exception e) {
             System.out.println(e.getMessage());

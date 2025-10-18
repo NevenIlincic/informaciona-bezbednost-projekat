@@ -20,4 +20,6 @@ public class EECertificateDTO {
     private String subjectEmail;
     private LocalDateTime validFrom;
     private LocalDateTime validTo;
+    private boolean isDigitalSignature;
+    private boolean isKeyEncipherment;
 }

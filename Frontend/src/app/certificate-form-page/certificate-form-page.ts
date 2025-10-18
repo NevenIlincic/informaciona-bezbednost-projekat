@@ -28,7 +28,9 @@ export class CertificateFormPage implements OnInit {
       certificatePassword: ['', Validators.required],
       certificateValidFrom: ['', Validators.required],
       certificateValidTo: ['', Validators.required],
-      foundCACertificates: ['', Validators.required]
+      foundCACertificates: ['', Validators.required],
+      keyUsageDigitalSignature: [false],
+      keyUsageKeyEncipherment: [false]
     });
   }
 
@@ -57,6 +59,9 @@ export class CertificateFormPage implements OnInit {
       subjectOrganizationName: this.loginForm.get('subjectOrganizationName')?.value,
       validFrom: this.loginForm.get('certificateValidFrom')?.value,
       validTo: this.loginForm.get('certificateValidTo')?.value,
+      isDigitalSignature: this.loginForm.get('keyUsageDigitalSignature')?.value,
+      isKeyEncipherment: this.loginForm.get('keyUsageKeyEncipherment')?.value
+
     }
 
     this.certificateService.createEECertificateRegularUser(eeCertificateDTO).subscribe({

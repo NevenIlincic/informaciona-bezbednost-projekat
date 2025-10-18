@@ -7,5 +7,7 @@ export interface EECertificateDTO{
     subjectCountry: string,
     subjectEmail: string,
     validFrom: string,
-    validTo: string
+    validTo: string,
+    isDigitalSignature: boolean,
+    isKeyEncipherment: boolean
 }

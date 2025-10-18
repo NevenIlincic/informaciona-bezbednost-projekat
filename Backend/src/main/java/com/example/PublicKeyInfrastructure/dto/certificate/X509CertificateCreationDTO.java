@@ -17,6 +17,7 @@ public class X509CertificateCreationDTO {
     private String subjectCountry;
     private String subjectEmail;
     private BigInteger serialNumber;
+    private KeyConstraintsDTO keyConstraints;
 
     public X509CertificateCreationDTO(CertificateDTO certificateDTO) {
         this.subjectCommonName = certificateDTO.getSubjectCommonName();
@@ -44,6 +45,7 @@ public class X509CertificateCreationDTO {
         SecureRandom random = new SecureRandom();
         // 64-bit random broj, dovoljno za jedinstvenost
         this.serialNumber = new BigInteger(64, random);
+        this.keyConstraints = new KeyConstraintsDTO(eeCertificateDTO.isDigitalSignature(), eeCertificateDTO.isKeyEncipherment());
     }
 
 }

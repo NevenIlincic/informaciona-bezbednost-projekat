@@ -67,6 +67,7 @@
             </div>
         </div>
         <div class="form-group">
+            <label>Issuer certificate</label>
             <select formControlName="foundCACertificates">
                 <option value="" disabled selected>Select CA Certificate to sign with</option>
                 <option *ngFor="let certificate of nonRevokedCACertificates" [ngValue]="certificate">
@@ -76,6 +77,18 @@
             <div *ngIf="loginForm.get('foundCACertificates')?.invalid && loginForm.get('foundCACertificates')?.touched"
                 class="error">
                 Issuer Certificate required.
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="checkbox-block">
+                <div class="checkbox-input">
+                    <input formControlName="keyUsageDigitalSignature" type="checkbox" />
+                    <p>Use for Digital Signature</p>
+                </div>
+                <div class="checkbox-input">
+                    <input formControlName="keyUsageKeyEncipherment" type="checkbox" />
+                    <p>Use for Key Encipherment</p>
+                </div>
             </div>
         </div>
         <button type="submit" class="btn-primary generate-button">

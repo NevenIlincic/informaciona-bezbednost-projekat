@@ -1,6 +1,7 @@
 package com.example.PublicKeyInfrastructure.utils;
 
 import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
+import com.example.PublicKeyInfrastructure.dto.certificate.KeyConstraintsDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.X509CertificateCreationDTO;
 import com.example.PublicKeyInfrastructure.model.Certificate;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -72,9 +73,8 @@ public class CertificateUtils {
                     notBefore,
                     notAfter,
                     certificateDTO.getSerialNumber(),
-                    isCACertificate
-
-
+                    isCACertificate,
+                    certificateDTO.getKeyConstraints()
             );
             return certificate;
         } catch (Exception e){
@@ -92,13 +92,14 @@ public class CertificateUtils {
 
     // Kreiranje X.509 sertifikata
     private X509Certificate createCertificate(PublicKey publicKey,
-                                                    PrivateKey issuerPrivateKey,
-                                                    X500Name subject,
-                                                    X500Name issuer,
-                                                    Date notBefore,
-                                                    Date notAfter,
-                                                    BigInteger serialNumber,
-                                              boolean isCACertificate) throws Exception {
+                                              PrivateKey issuerPrivateKey,
+                                              X500Name subject,
+                                              X500Name issuer,
+                                              Date notBefore,
+                                              Date notAfter,
+                                              BigInteger serialNumber,
+                                              boolean isCACertificate,
+                                              KeyConstraintsDTO keyConstraints) throws Exception {
 
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuer,
@@ -116,17 +117,15 @@ public class CertificateUtils {
                 new BasicConstraints(isCACertificate) // true = CA, false = end-entity
         );
 
-        certBuilder.addExtension(
-                Extension.keyUsage,
-                false,
-                new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment)
-        );
+        if (keyConstraints.isKeyEncipherment() || keyConstraints.isDigitalSignature()){
+            certBuilder = setKeyConstraints(certBuilder, keyConstraints);
+        }
 
-        certBuilder.addExtension(
-                Extension.extendedKeyUsage,
-                false,
-                new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth)
-        );
+//        certBuilder.addExtension(
+//                Extension.extendedKeyUsage,
+//                false,
+//                new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth)
+//        );
 
         // Potpisivanje sertifikata privatnim ključem izdavaoca
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
@@ -135,6 +134,31 @@ public class CertificateUtils {
         return new JcaX509CertificateConverter()
                 .setProvider("BC")
                 .getCertificate(certBuilder.build(signer));
+    }
+
+
+    private X509v3CertificateBuilder setKeyConstraints(X509v3CertificateBuilder certBuilder ,KeyConstraintsDTO keyConstraints) throws Exception {
+        X509v3CertificateBuilder newCertBuilder = certBuilder;
+        if (keyConstraints.isKeyEncipherment() && keyConstraints.isDigitalSignature()) {
+            newCertBuilder.addExtension(
+                    Extension.keyUsage,
+                    false,
+                    new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment)
+            );
+        }else if (!keyConstraints.isKeyEncipherment() && keyConstraints.isDigitalSignature()){
+            newCertBuilder.addExtension(
+                    Extension.keyUsage,
+                    false,
+                    new KeyUsage(KeyUsage.digitalSignature)
+            );
+        }else{
+            newCertBuilder.addExtension(
+                    Extension.keyUsage,
+                    false,
+                    new KeyUsage(KeyUsage.keyEncipherment)
+            );
+        }
+        return newCertBuilder;
     }
 
     public X509Certificate pemToX509Certificate(String pem) {
