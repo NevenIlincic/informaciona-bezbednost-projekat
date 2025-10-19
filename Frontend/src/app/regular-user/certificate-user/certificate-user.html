@@ -91,6 +91,6 @@
         
     </mat-card-content>
     <mat-card-footer *ngIf="!userCertificate.revoked">
-        <button class="btn-primary" (click)="revokeCertificate(userCertificate.id)"> REVOKE </button>
+        <button class="btn-primary" (click)="openRevokeDialog(userCertificate.id)"> REVOKE </button>
     </mat-card-footer>
 </mat-card>
