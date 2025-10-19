@@ -6,6 +6,7 @@ import { EECertificateDTO } from '../../dto/certificate/EECertificateDTO';
 import { Pcks12DTO } from '../../dto/certificate/Pcks12DTO';
 import { RegularUserCertificateDTO } from '../../dto/certificate/RegularUserCertificateDTO';
 import { RevocationDTO } from '../../dto/certificate/RevocationDTO';
+import { CertificateTabDTO } from '../../dto/certificate/CertificateTabDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -34,5 +35,9 @@ export class CertificateService {
 
   revokeCertificate(revocationDTO: RevocationDTO): Observable<null>{
     return this.httpClient.delete<null>(this.apiUrl+"/revoke", {body: revocationDTO});
+  }
+
+  getAllCertificatesAdmin(): Observable<CertificateTabDTO[]>{
+    return this.httpClient.get<CertificateTabDTO[]>(this.apiUrl+"/admin");
   }
 }

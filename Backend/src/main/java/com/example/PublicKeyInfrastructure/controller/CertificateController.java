@@ -28,6 +28,18 @@ public class CertificateController {
     @Autowired
     private AESUtils aesUtils;
 
+    @GetMapping(value = "/admin")
+    public ResponseEntity<List<CertificateTabDTO>> getAllCertificates(){
+        try {
+            List<CertificateTabDTO> certificateTabDTOS = this.certificateService.getAllCertificates();
+            return new ResponseEntity<>(certificateTabDTOS, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     @PostMapping(value = "/root")
     public ResponseEntity<?> createRootCertificate(@RequestBody CertificateDTO certificateDTO) {
 //        getMasterKey();

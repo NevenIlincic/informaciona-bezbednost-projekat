@@ -48,3 +48,15 @@ mat-card-content p{
     font-weight: bold;
 }
 
+mat-card-footer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-bottom: 10px;
+}
+
+.btn-primary{
+width: 30%;
+}

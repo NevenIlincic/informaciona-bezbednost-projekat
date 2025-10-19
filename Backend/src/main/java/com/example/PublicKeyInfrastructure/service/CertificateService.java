@@ -7,12 +7,8 @@ import com.example.PublicKeyInfrastructure.utils.AESUtils;
 import com.example.PublicKeyInfrastructure.utils.CertificateUtils;
 import com.example.PublicKeyInfrastructure.utils.CertificateValidator;
 import com.example.PublicKeyInfrastructure.utils.RSAUtils;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -293,5 +289,43 @@ public class CertificateService {
 
     public void revokeCertificate(int id, String revocationReason){
         this.certificateRepository.revokeCertificate(id, revocationReason, LocalDateTime.now());
+    }
+
+    public List<CertificateTabDTO> getAllCertificates() throws Exception{
+        List<Certificate> allCertificates = this.certificateRepository.findAll();
+        List<CertificateTabDTO> foundCertificatesDTO = new ArrayList<>();
+        for (Certificate certificate : allCertificates) {
+            CertificateTabDTO regularUserCertificateDTO = new CertificateTabDTO(certificate);
+            X509Certificate x509Certificate = certificateUtils.pemToX509Certificate(certificate.getCertificatePem());
+            boolean[] keyUsage = x509Certificate.getKeyUsage();
+            if (keyUsage[0]){
+                regularUserCertificateDTO.setDigitalSignature("Digital Signature");
+            }
+            if (keyUsage[2]){
+                regularUserCertificateDTO.setKeyEncipherment("Key Encipherment");
+            }
+            //TIP
+            if (certificate.getIssuerCertificate() == null){
+                regularUserCertificateDTO.setType("ROOT");
+            }else{
+                if (x509Certificate.getBasicConstraints() == -1){
+                    regularUserCertificateDTO.setType("END-ENTITY");
+                }else{
+                    regularUserCertificateDTO.setType("CA");
+                }
+            }
+            //Extended Key Usage Constraints
+            List<String> ekuOids = x509Certificate.getExtendedKeyUsage();
+            if (ekuOids != null) {
+                if (ekuOids.contains("1.3.6.1.5.5.7.3.1")) {
+                    regularUserCertificateDTO.setServerAuth("Server Auth");
+                }
+                if (ekuOids.contains("1.3.6.1.5.5.7.3.2")) {
+                   regularUserCertificateDTO.setClientAuth("Client Auth");
+                }
+            }
+            foundCertificatesDTO.add(regularUserCertificateDTO);
+        }
+        return foundCertificatesDTO;
     }
 }
