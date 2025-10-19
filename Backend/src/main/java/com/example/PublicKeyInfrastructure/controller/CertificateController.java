@@ -83,6 +83,18 @@ public class CertificateController {
         return new ResponseEntity<>(foundCertificatesDTO, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/download")
+    public ResponseEntity<Pcks12DTO> downloadCertificate(@RequestBody DownloadCertificateDTO downloadCertificateDTO){
+        try{
+            byte[] pcks12bytes = certificateService.downloadCertificate(downloadCertificateDTO);
+            String encoded =  Base64.getEncoder().encodeToString(pcks12bytes);
+            Pcks12DTO pcks12DTO = new Pcks12DTO(encoded, "Downloaded Certificate");
+            return new ResponseEntity<>(pcks12DTO,HttpStatus.OK);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(new Pcks12DTO("Invalid", "Invalid"),HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @DeleteMapping(value = "/revoke")
     public ResponseEntity<?> revokeCertificate(@RequestBody RevocationDTO revocationDTO){
         this.certificateService.revokeCertificate(revocationDTO.getId(), revocationDTO.getRevocationReason());
@@ -95,6 +107,7 @@ public class CertificateController {
 //        AdminMasterKey adminMasterKey = new AdminMasterKey(null, encryptedMasterKey);
 //        adminMasterKeyService.saveMasterKey(adminMasterKey);
     }
+
 
     private void getMasterKey(){
         AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();

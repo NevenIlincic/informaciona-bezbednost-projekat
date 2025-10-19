@@ -59,7 +59,7 @@
         
     </mat-card-content>
     <mat-card-footer>
-        <button class="btn-primary"> DOWNLOAD </button>
+        <button class="btn-primary" (click)="openDownloadDialog(singleCertificate.id)"> DOWNLOAD </button>
         <button *ngIf="!singleCertificate.revoked" class="btn-primary" (click)="openRevokeDialog(singleCertificate.id)" style="background-color: red;"> REVOKE </button>
     </mat-card-footer>
 </mat-card>

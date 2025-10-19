@@ -7,6 +7,10 @@ import { RevocationDTO } from '../../../dto/certificate/RevocationDTO';
 import { RevokeDialog } from '../../dialog/revoke-dialog/revoke-dialog';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
+import { Pcks12DTO } from '../../../dto/certificate/Pcks12DTO';
+import { HttpErrorResponse } from '@angular/common/http';
+import { DownloadDialog } from '../../dialog/download-dialog/download-dialog';
+import { DownloadCertificateDTO } from '../../../dto/certificate/DownloadCertificateDTO';
 
 @Component({
   selector: 'app-certificate-admin',
@@ -39,10 +43,6 @@ export class CertificateAdmin {
     this.keyConstraints = this.keyConstraints.filter(item => item !== '');
     this.extentedKeyConstraints = [this.singleCertificate.serverAuth, this.singleCertificate.clientAuth];
     this.extentedKeyConstraints = this.extentedKeyConstraints.filter(item => item !== '');
-    // if (filteredString == ""){
-    //   this.keyConstraints = [];
-    // }else{
-    // }
   }
 
   revokeCertificate(certificateId: number, reason: string) {
@@ -84,4 +84,42 @@ export class CertificateAdmin {
       }
     });
   }
+  openDownloadDialog(certificateId: number): void {
+    const dialogRef = this.revokeDialog.open(DownloadDialog, {
+      panelClass:["high-z-index-dialog"]
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        if (result.success) {
+          this.downloadCertificate(certificateId, result.password);
+        }
+      }
+    });
+  }
+  downloadCertificate(certificateId: number, password: string): void{
+    const dto: DownloadCertificateDTO = {
+      id: certificateId,
+      pkcs12password: password
+    }
+     this.certificateService.requestCertificateDownload(dto).subscribe({
+      next: (pcksDTO: Pcks12DTO) => {
+        this.certificateService.downloadCertificate(pcksDTO);
+      },
+      error: (err: HttpErrorResponse) => {
+        if (err.status == 400) {
+          const errorDTO: Pcks12DTO = err.error;
+          if (errorDTO.encodedPcks12 == "Invalid") {
+            this.snackBar.open('Issuer certificate is invalid!', 'I Understand', {
+              duration: undefined,
+              verticalPosition: 'bottom',
+              panelClass: ["snack-bar-refresh-token-error"]
+            });
+          }
+        }
+      }
+    });
+
+  }
+  
 }

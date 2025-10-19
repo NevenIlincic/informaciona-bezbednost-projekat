@@ -210,6 +210,5 @@ public class CertificateUtils {
             createdCertficate = createdCertficate.getIssuerCertificate();
         }
         return certList;
-
     }
 }

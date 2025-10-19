@@ -68,26 +68,8 @@ export class CertificateFormPage implements OnInit {
 
     this.certificateService.createEECertificateRegularUser(eeCertificateDTO).subscribe({
       next: (pcksDTO: Pcks12DTO) => {
-        // Decode Base64 u binarni array
-        const binary = atob(pcksDTO.encodedPcks12);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-          bytes[i] = binary.charCodeAt(i);
-        }
-
-        // Kreiramo Blob i URL za download
-        const blob = new Blob([bytes], { type: 'application/x-pkcs12' });
-        const url = window.URL.createObjectURL(blob);
-
-        // Automatski download
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = pcksDTO.fileName;
-        a.click();
-
-        window.URL.revokeObjectURL(url);
+        this.certificateService.downloadCertificate(pcksDTO);
         this.isSubmitting = false;
-
       },
       error: (err: HttpErrorResponse) => {
         if (err.status == 400) {

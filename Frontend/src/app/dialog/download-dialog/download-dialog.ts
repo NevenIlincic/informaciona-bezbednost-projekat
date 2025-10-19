@@ -1,24 +1,25 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog'
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
 @Component({
-  selector: 'app-revoke-dialog',
+  selector: 'app-download-dialog',
   imports: [FormsModule, ReactiveFormsModule, CommonModule],
-  templateUrl: './revoke-dialog.html',
-  styleUrl: './revoke-dialog.css'
+  templateUrl: './download-dialog.html',
+  styleUrl: './download-dialog.css'
 })
-export class RevokeDialog {
+export class DownloadDialog {
   dialogForm: FormGroup;
 
   constructor(
-    public dialogRef: MatDialogRef<RevokeDialog>,
+    public dialogRef: MatDialogRef<DownloadDialog>,
     @Inject(MAT_DIALOG_DATA) public data: any,
 
     private fb: FormBuilder,
-  ) { 
+  ) {
     this.dialogForm = this.fb.group({
-      reasonInput: ['', [Validators.required, Validators.pattern(/^(?=.*[A-Za-z0-9]).+$/)]],
+      passwordInput: ['', [Validators.required, Validators.pattern(/^(?=.*[A-Za-z0-9]).+$/)]],
     });
   }
 
@@ -28,7 +29,7 @@ export class RevokeDialog {
     if (this.dialogForm.invalid) return;
     const resultData = {
       success: true,
-      reason: this.dialogForm.get("reasonInput")?.value // Podatak koji vraćamo
+      password: this.dialogForm.get("passwordInput")?.value // Podatak koji vraćamo
     };
     this.dialogRef.close(resultData);
   }
@@ -39,4 +40,3 @@ export class RevokeDialog {
     this.dialogRef.close(undefined);
   }
 }
-
