@@ -124,11 +124,9 @@ public class CertificateUtils {
             certBuilder = setKeyConstraints(certBuilder, keyConstraints);
         }
 
-//        certBuilder.addExtension(
-//                Extension.extendedKeyUsage,
-//                false,
-//                new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth)
-//        );
+        if (extendedKeyConstaints != null && (extendedKeyConstaints.isClientAuth() || extendedKeyConstaints.isServerAuth())){
+            certBuilder = setExtendedKeyConstraints(certBuilder, extendedKeyConstaints);
+        }
 
         // Potpisivanje sertifikata privatnim ključem izdavaoca
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
