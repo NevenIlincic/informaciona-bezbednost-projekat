@@ -21,33 +21,29 @@ mat-card-header p{
 }
 
 mat-card-content{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     background-color: white;
     border-radius: 5px;
     width: 75%;
     margin: 0 auto;
+    padding-top: 10px;
+    padding-bottom: 20px;
     margin-bottom: 30px;
-    justify-content: space-between;
+    grid-auto-rows: auto;
+    row-gap: 20px;
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: hidden;
+
 }
 
-mat-card-content .labels{
-    display: flex;
-    flex-direction: column;
+mat-card-content p{
+    font-size: 15px;
+    margin: 0;
 }
 
-mat-card-content .labels p{
+.label-text{
     font-weight: bold;
-    font-size: 15px;
 }
 
-mat-card-content .values{
-    display: flex;
-    flex-direction: column;
-}
-mat-card-content .values p{
-    display: flex;
-    flex-direction: column;
-    font-size: 15px;
-}

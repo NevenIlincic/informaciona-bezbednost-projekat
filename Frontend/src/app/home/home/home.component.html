@@ -1,6 +1,9 @@
 
 <!-- <app-navbar-regular-user></app-navbar-regular-user> -->
-<div class="home-container">
+<div *ngIf="role == 'REGULAR_USER'">
+  <app-certificates-tab></app-certificates-tab>
+</div>
+<!-- <div class="home-container">
   <h1>Welcome to the Home Page</h1>
   <p>This is a placeholder. You can add your dashboard or landing content here later.</p>
-</div>
+</div> -->

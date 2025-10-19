@@ -1,4 +1,4 @@
-<mat-card class="card">
+<!-- <mat-card class="card">
     <mat-card-header class="header">
         <p>CERTIFICATE</p>
     </mat-card-header>
@@ -29,14 +29,68 @@
             <div *ngIf="keyConstraints.length == 0">
                 <p>None</p>
             </div>
-            <ng-container *ngIf="keyConstraints.length != 0">
-                <p *ngFor="let contraint of keyConstraints">{{contraint}}</p>
-            </ng-container>
+            <div *ngIf="keyConstraints.length != 0">
+                <ng-container *ngFor="let contraint of keyConstraints">
+                    <p>{{contraint}}</p>
+                </ng-container>
+            </div>
             <p *ngIf="userCertificate.revoked">{{revocationDate | date: 'dd.MM.yyyy.'}}</p>
             <p *ngIf="userCertificate.revoked">{{userCertificate.revocationReason}}</p>
         </div>
     </mat-card-content>
     <mat-card-footer *ngIf="!userCertificate.revoked">
         <button class="btn-primary" (click)="revokeCertificate(userCertificate.id)"> REVOKE </button>
+    </mat-card-footer>
+</mat-card> -->
+<mat-card class="card">
+    <mat-card-header class="header">
+        <p>CERTIFICATE</p>
+    </mat-card-header>
+
+    <mat-card-content class="content">
+        <p class="label-text">CN:</p>
+        <p class="value-text">{{userCertificate.subjectOrganizationName}}</p>
+
+        <p class="label-text">O:</p>
+        <p class="value-text">{{userCertificate.subjectOrganizationName}}</p>
+
+        <p class="label-text">OI:</p>
+        <p class="value-text">{{userCertificate.subjectOrganizationalUnit}}</p>
+        
+        <p class="label-text">E:</p>
+        <p class="value-text">{{userCertificate.subjectEmail}}</p>
+
+        <p class="label-text">C:</p>
+        <p class="value-text">{{userCertificate.subjectCountry}}</p>
+
+        <p class="label-text">Serial number:</p>
+        <p class="value-text">{{userCertificate.serialNumber}}</p>
+
+        <p class="label-text">Valid from:</p>
+        <p class="value-text">{{userCertificate.validFrom | date:'dd.MM.yyyy.'}}</p>
+
+        <p class="label-text">Valid to:</p>
+        <p class="value-text">{{userCertificate.validTo | date: 'dd.MM.yyyy.'}}</p>
+
+        <p class="label-text key-constraints-label">Key constraints:</p> 
+        
+        <div class="value-text key-constraints-value">
+            <p *ngIf="keyConstraints.length == 0">None</p>
+            <ng-container *ngIf="keyConstraints.length != 0">
+                <p *ngFor="let constraint of keyConstraints">{{constraint}}</p>
+            </ng-container>
+        </div>
+
+        <ng-container *ngIf="userCertificate.revoked">
+            <p class="label-text">Revocation date:</p>
+            <p class="value-text">{{revocationDate | date: 'dd.MM.yyyy.'}}</p>
+
+            <p class="label-text">Revocation reason:</p>
+            <p class="value-text">{{userCertificate.revocationReason}}</p>
+        </ng-container>
+        
+    </mat-card-content>
+    <mat-card-footer *ngIf="!userCertificate.revoked">
+        <button class="btn-primary" (click)="openRevokeDialog(userCertificate.id)"> REVOKE </button>
     </mat-card-footer>
 </mat-card>
