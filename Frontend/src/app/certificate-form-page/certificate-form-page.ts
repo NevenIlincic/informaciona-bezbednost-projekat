@@ -68,7 +68,7 @@ export class CertificateFormPage implements OnInit {
       isClientAuth: this.loginForm.get("eKeyUsageClientAuth")?.value
     }
 
-    this.certificateService.createEECertificateRegularUser(eeCertificateDTO).subscribe({
+    this.certificateService.createEECertificateRegularUser(eeCertificateDTO, 'false').subscribe({
       next: (pcksDTO: Pcks12DTO) => {
         this.certificateService.downloadCertificate(pcksDTO);
         this.isSubmitting = false;

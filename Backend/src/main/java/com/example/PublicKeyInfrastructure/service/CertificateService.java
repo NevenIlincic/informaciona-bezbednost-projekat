@@ -61,6 +61,8 @@ public class CertificateService {
             String certificatePEM = certificateUtils.convertToPem(certificateX509);
             certificate.setPublicKeyPem(publicKeyPem);
             certificate.setCertificatePem(certificatePEM);
+            certificate.setSerialNumber(x509CertificateCreationDTO.getSerialNumber().toString());
+
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -101,6 +103,8 @@ public class CertificateService {
             String certificatePEM = certificateUtils.convertToPem(certificateX509);
             certificate.setPublicKeyPem(publicKeyPem);
             certificate.setCertificatePem(certificatePEM);
+            certificate.setSerialNumber(x509CertificateCreationDTO.getSerialNumber().toString());
+
 
         }catch (Exception e){
             System.out.println(e.getMessage());

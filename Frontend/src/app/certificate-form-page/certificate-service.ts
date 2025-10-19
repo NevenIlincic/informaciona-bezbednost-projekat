@@ -9,6 +9,7 @@ import { RevocationDTO } from '../../dto/certificate/RevocationDTO';
 import { CertificateTabDTO } from '../../dto/certificate/CertificateTabDTO';
 import { DownloadCertificateDTO } from '../../dto/certificate/DownloadCertificateDTO';
 import { NonEECertificateDTO } from '../../dto/certificate/NonEECertificateDTO';
+import { IntermediateCertificateDTO } from '../../dto/certificate/IntermediateCertificateDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -42,14 +43,19 @@ export class CertificateService {
     return this.httpClient.get<NonRevokedCACertificateDTO[]>(this.apiUrl + "/intermediate");
   }
 
-  createEECertificateRegularUser(eeCertificate: EECertificateDTO): Observable<Pcks12DTO> {
-    const params = new HttpParams().set('isAdminCreating', 'false'); // string
+  createEECertificateRegularUser(eeCertificate: EECertificateDTO, isAdminCreatingString: string): Observable<Pcks12DTO> {
+    const params = new HttpParams().set('isAdminCreating', isAdminCreatingString); // string
     return this.httpClient.post<Pcks12DTO>(
       this.apiUrl + "/end-entity",
       eeCertificate,
       { params: params }
     );
   }
+
+  createIntermediateCertificate(intermediateCertificate: IntermediateCertificateDTO): Observable<null>{
+    return this.httpClient.post<null>(this.apiUrl+"/intermediate", intermediateCertificate);
+  }
+
   getRegularUserCertificates(userEmail: string): Observable<RegularUserCertificateDTO[]>{
     return this.httpClient.get<RegularUserCertificateDTO[]>(this.apiUrl + `/end-entity/user/${userEmail}`);
   }
