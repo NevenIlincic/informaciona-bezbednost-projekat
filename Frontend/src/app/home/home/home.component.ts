@@ -1,11 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../account/auth.service';
+import { ɵEmptyOutletComponent } from "@angular/router";
+import { CertificatesTab } from "../../regular-user/certificates-tab/certificates-tab";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CertificatesTab],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent { }
+export class HomeComponent implements OnInit { 
+
+  constructor(private authService: AuthService){}
+
+  role:string = "";
+
+  ngOnInit(): void {
+    this.role = this.authService.getRole();
+    console.log(this.role);
+  }
+
+}

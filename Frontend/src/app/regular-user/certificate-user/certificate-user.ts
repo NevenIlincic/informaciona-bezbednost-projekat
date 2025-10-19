@@ -32,10 +32,11 @@ export class CertificateUser implements OnInit {
     }
 
     this.keyConstraints = [this.userCertificate.digitalSignature, this.userCertificate.keyEncipherment];
-    const filteredString = this.keyConstraints .filter(item => item !== '').join(',');
-    if (filteredString == ""){
-      this.keyConstraints = [];
-    }
+    this.keyConstraints = this.keyConstraints .filter(item => item !== '');
+    // if (filteredString == ""){
+    //   this.keyConstraints = [];
+    // }else{
+    // }
   }
 
   revokeCertificate(certificateId: number){
