@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { NonRevokedCACertificateDTO } from '../../dto/certificate/NonRevokedCACertificateDTO';
 import { EECertificateDTO } from '../../dto/certificate/EECertificateDTO';
 import { Pcks12DTO } from '../../dto/certificate/Pcks12DTO';
+import { RegularUserCertificateDTO } from '../../dto/certificate/RegularUserCertificateDTO';
+import { RevocationDTO } from '../../dto/certificate/RevocationDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +28,11 @@ export class CertificateService {
       { params: params }
     );
   }
-  // createEECertificate():
+  getRegularUserCertificates(userEmail: string): Observable<RegularUserCertificateDTO[]>{
+    return this.httpClient.get<RegularUserCertificateDTO[]>(this.apiUrl + `/end-entity/user/${userEmail}`);
+  }
+
+  revokeCertificate(revocationDTO: RevocationDTO): Observable<null>{
+    return this.httpClient.delete<null>(this.apiUrl+"/revoke", {body: revocationDTO});
+  }
 }

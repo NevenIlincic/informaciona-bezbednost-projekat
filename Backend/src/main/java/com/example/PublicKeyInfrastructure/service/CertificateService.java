@@ -1,9 +1,6 @@
 package com.example.PublicKeyInfrastructure.service;
 
-import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
-import com.example.PublicKeyInfrastructure.dto.certificate.EECertificateDTO;
-import com.example.PublicKeyInfrastructure.dto.certificate.IntermediateCertificateDTO;
-import com.example.PublicKeyInfrastructure.dto.certificate.X509CertificateCreationDTO;
+import com.example.PublicKeyInfrastructure.dto.certificate.*;
 import com.example.PublicKeyInfrastructure.model.*;
 import com.example.PublicKeyInfrastructure.repository.CertificateRepository;
 import com.example.PublicKeyInfrastructure.utils.AESUtils;
@@ -166,6 +163,24 @@ public class CertificateService {
         return certificateRepository.findById(id).orElse(null);
     }
 
+    public List<RegularUserCertificateDTO> getRegularUserCertificateDTO(String email){
+        List<Certificate> foundCertificates = this.certificateRepository.findCertificatesBySubjectEmail(email);
+        List<RegularUserCertificateDTO> foundCertificatesDTO = new ArrayList<>();
+        for (Certificate certificate : foundCertificates) {
+            RegularUserCertificateDTO regularUserCertificateDTO = new RegularUserCertificateDTO(certificate);
+            X509Certificate x509Certificate = certificateUtils.pemToX509Certificate(certificate.getCertificatePem());
+            boolean[] keyUsage = x509Certificate.getKeyUsage();
+            if (keyUsage[0]){
+                regularUserCertificateDTO.setDigitalSignature("Digital Signature");
+            }
+            if (keyUsage[2]){
+                regularUserCertificateDTO.setKeyEncipherment("Key Encipherment");
+            }
+            foundCertificatesDTO.add(regularUserCertificateDTO);
+        }
+        return foundCertificatesDTO;
+    }
+
     private Certificate setCertificateAttributes(Object dto, Certificate issuerCertificate){
         Certificate certificate = new Certificate();
         if (dto instanceof CertificateDTO){
@@ -274,5 +289,9 @@ public class CertificateService {
 
     public List<Certificate> findNonRevokedCACertificates(){
         return this.certificateRepository.returnNonRevokedCertificates(CertificateType.INTERMEDIATE);
+    }
+
+    public void revokeCertificate(int id, String revocationReason){
+        this.certificateRepository.revokeCertificate(id, revocationReason, LocalDateTime.now());
     }
 }
