@@ -8,6 +8,7 @@ import { CertificateFormPage } from './certificate-form-page/certificate-form-pa
 import { CertificateUser } from './regular-user/certificate-user/certificate-user';
 import { RoutingAuthService } from './authorization/routing-auth-service';
 import { CertificatesTab } from './regular-user/certificates-tab/certificates-tab';
+import { CertificateFormPageAdmin } from './admin/certificate-form-page-admin/certificate-form-page-admin';
 
 
 export const routes: Routes = [
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'activation-success', component: ActivationSuccessComponent },
   { path: 'activation-failure', component: ActivationFailureComponent },
   { path: 'certificate-form-page', component: CertificateFormPage, canActivate: [RoutingAuthService], data: {role: "REGULAR_USER"}},
-  { path: 'user-certificates', component: CertificatesTab, canActivate: [RoutingAuthService], data: {role: "REGULAR_USER"}}
+  { path: 'user-certificates', component: CertificatesTab, canActivate: [RoutingAuthService], data: {role: "REGULAR_USER"}},
+  { path: 'certificate-form-page-admin', component: CertificateFormPageAdmin, canActivate: [RoutingAuthService], data: {role: "ADMINISTRATOR"}}
 ];
 

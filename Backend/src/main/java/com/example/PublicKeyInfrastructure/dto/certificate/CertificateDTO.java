@@ -19,4 +19,8 @@ public class CertificateDTO {
     private String serialNumber;
     private LocalDateTime validFrom;
     private LocalDateTime validTo;
+    private boolean isDigitalSignature;
+    private boolean isKeyEncipherment;
+    private boolean isServerAuth;
+    private boolean isClientAuth;
 }

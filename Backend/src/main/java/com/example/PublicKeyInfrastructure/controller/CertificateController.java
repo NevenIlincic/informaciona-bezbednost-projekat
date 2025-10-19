@@ -111,6 +111,8 @@ public class CertificateController {
 //        adminMasterKeyService.saveMasterKey(adminMasterKey);
     }
 
+//    @GetMapping(value = "/non-end-entity")
+//    public
 
     private void getMasterKey(){
         AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();

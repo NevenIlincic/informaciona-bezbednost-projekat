@@ -1,0 +1,90 @@
+.certificate-form-block{
+    margin-top: 75px;
+    justify-self: center;
+    background-color: rgb(142, 174, 203);
+    padding: 30px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+}
+
+.form-box{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 20px;
+  justify-content: center;
+}
+
+.title{
+    font-size: 50px;
+    font-weight: bold;
+}
+
+/* Polja forme */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-bottom: 5px;
+  width: 300px;
+}
+
+.form-group label {
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+
+.generate-button {
+  max-width: 300px;
+  max-height: 50px;
+  width: 50%;
+  align-self: center;
+}
+
+.form-group select {
+  border-radius: 5px;
+  height: 40px;
+  font-weight: 300;
+}
+
+.bottom-block {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  justify-items: center;
+  margin-left: 75px;
+  gap: 20px;
+}
+
+option {
+  text-align: center;
+  font-weight: bold;
+}
+
+.checkbox-block{
+  display: flex;
+  flex-direction: column;
+  justify-items: start;
+  height: 100%;
+}
+
+.checkbox-block input{
+  width: 25px;
+}
+
+.checkbox-input{
+  display: flex;
+  flex-direction: row;
+}

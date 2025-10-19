@@ -1,27 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CertificateService } from './certificate-service';
-import { EECertificateDTO } from '../../dto/certificate/EECertificateDTO';
-import { NonRevokedCACertificateDTO } from '../../dto/certificate/NonRevokedCACertificateDTO';
-import { Pcks12DTO } from '../../dto/certificate/Pcks12DTO';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NonRevokedCACertificateDTO } from '../../../dto/certificate/NonRevokedCACertificateDTO';
+import { CertificateService } from '../../certificate-form-page/certificate-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpErrorResponse } from '@angular/common/http';
+import { EECertificateDTO } from '../../../dto/certificate/EECertificateDTO';
+import { Pcks12DTO } from '../../../dto/certificate/Pcks12DTO';
 
 @Component({
-  selector: 'app-certificate-form-page',
-  imports: [ReactiveFormsModule, CommonModule, FormsModule],
-  templateUrl: './certificate-form-page.html',
-  styleUrl: './certificate-form-page.css'
+  selector: 'app-certificate-form-page-admin',
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  templateUrl: './certificate-form-page-admin.html',
+  styleUrl: './certificate-form-page-admin.css'
 })
-export class CertificateFormPage implements OnInit {
-  loginForm: FormGroup;
+export class CertificateFormPageAdmin {
+  certificateForm: FormGroup;
   nonRevokedCACertificates: NonRevokedCACertificateDTO[] = [];
   selectedCACertificate: NonRevokedCACertificateDTO | null = null;
   isSubmitting = false;
 
   constructor(private formBuilder: FormBuilder, private certificateService: CertificateService, private snackBar: MatSnackBar) {
-    this.loginForm = formBuilder.group({
+    this.certificateForm = formBuilder.group({
       subjectCommonName: ['', Validators.required],
       subjectEmail: ['', Validators.required],
       subjectCountry: ['', Validators.required],
@@ -48,30 +48,30 @@ export class CertificateFormPage implements OnInit {
 
 
   onSubmit() {
-    if (this.loginForm.invalid) { return; }
+    if (this.certificateForm.invalid) { return; }
     this.isSubmitting = true;
-    this.selectedCACertificate = this.loginForm.get("foundCACertificates")?.value;
+    this.selectedCACertificate = this.certificateForm.get("foundCACertificates")?.value;
 
+    // Dodati if isAdminCreating
     const eeCertificateDTO: EECertificateDTO = {
       issuerCertificateId: this.selectedCACertificate!.id,
-      passwordForCertificate: this.loginForm.get('certificatePassword')?.value,
-      subjectCommonName: this.loginForm.get('subjectCommonName')?.value,
-      subjectCountry: this.loginForm.get('subjectCountry')?.value,
-      subjectEmail: this.loginForm.get('subjectEmail')?.value,
-      subjectOrganizationalUnit: this.loginForm.get('subjectOrganizationalUnit')?.value,
-      subjectOrganizationName: this.loginForm.get('subjectOrganizationName')?.value,
-      validFrom: this.loginForm.get('certificateValidFrom')?.value,
-      validTo: this.loginForm.get('certificateValidTo')?.value,
-      isDigitalSignature: this.loginForm.get('keyUsageDigitalSignature')?.value,
-      isKeyEncipherment: this.loginForm.get('keyUsageKeyEncipherment')?.value,
-      isServerAuth: this.loginForm.get("eKeyUsageServerAuth")?.value,
-      isClientAuth: this.loginForm.get("eKeyUsageClientAuth")?.value
+      passwordForCertificate: this.certificateForm.get('certificatePassword')?.value,
+      subjectCommonName: this.certificateForm.get('subjectCommonName')?.value,
+      subjectCountry: this.certificateForm.get('subjectCountry')?.value,
+      subjectEmail: this.certificateForm.get('subjectEmail')?.value,
+      subjectOrganizationalUnit: this.certificateForm.get('subjectOrganizationalUnit')?.value,
+      subjectOrganizationName: this.certificateForm.get('subjectOrganizationName')?.value,
+      validFrom: this.certificateForm.get('certificateValidFrom')?.value,
+      validTo: this.certificateForm.get('certificateValidTo')?.value,
+      isDigitalSignature: this.certificateForm.get('keyUsageDigitalSignature')?.value,
+      isKeyEncipherment: this.certificateForm.get('keyUsageKeyEncipherment')?.value,
+      isServerAuth: this.certificateForm.get("eKeyUsageServerAuth")?.value,
+      isClientAuth: this.certificateForm.get("eKeyUsageClientAuth")?.value
     }
 
     this.certificateService.createEECertificateRegularUser(eeCertificateDTO).subscribe({
-      next: (pcksDTO: Pcks12DTO) => {
-        this.certificateService.downloadCertificate(pcksDTO);
-        this.isSubmitting = false;
+      next: () => {
+
       },
       error: (err: HttpErrorResponse) => {
         if (err.status == 400) {

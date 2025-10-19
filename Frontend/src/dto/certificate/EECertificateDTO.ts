@@ -9,5 +9,7 @@ export interface EECertificateDTO{
     validFrom: string,
     validTo: string,
     isDigitalSignature: boolean,
-    isKeyEncipherment: boolean
+    isKeyEncipherment: boolean,
+    isServerAuth: boolean,
+    isClientAuth: boolean
 }

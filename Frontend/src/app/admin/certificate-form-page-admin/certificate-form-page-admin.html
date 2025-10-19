@@ -1,10 +1,10 @@
 <div class="certificate-form-block">
     <h2 class="title">GENERATE CERTIFICATE</h2>
-    <form [formGroup]="loginForm" class="form-box" (ngSubmit)="onSubmit()">
+    <form [formGroup]="certificateForm" class="form-box" (ngSubmit)="onSubmit()">
         <div class="form-group">
             <label>Common Name</label>
             <input formControlName="subjectCommonName" type="text" placeholder="Enter your first and last name" />
-            <div *ngIf="loginForm.get('subjectCommonName')?.invalid && loginForm.get('subjectCommonName')?.touched"
+            <div *ngIf="certificateForm.get('subjectCommonName')?.invalid && certificateForm.get('subjectCommonName')?.touched"
                 class="error">
                 Common name required.
             </div>
@@ -12,7 +12,7 @@
         <div class="form-group">
             <label>Organization Name</label>
             <input formControlName="subjectOrganizationName" type="text" placeholder="Enter organization name" />
-            <div *ngIf="loginForm.get('subjectOrganizationName')?.invalid && loginForm.get('subjectOrganizationName')?.touched"
+            <div *ngIf="certificateForm.get('subjectOrganizationName')?.invalid && certificateForm.get('subjectOrganizationName')?.touched"
                 class="error">
                 Organization name required.
             </div>
@@ -20,7 +20,7 @@
         <div class="form-group">
             <label>Organizational unit</label>
             <input formControlName="subjectOrganizationalUnit" type="text" placeholder="Enter organizational unit" />
-            <div *ngIf="loginForm.get('subjectOrganizationalUnit')?.invalid && loginForm.get('subjectOrganizationalUnit')?.touched"
+            <div *ngIf="certificateForm.get('subjectOrganizationalUnit')?.invalid && certificateForm.get('subjectOrganizationalUnit')?.touched"
                 class="error">
                 Organizational unit required.
             </div>
@@ -28,14 +28,14 @@
         <div class="form-group">
             <label>Email</label>
             <input formControlName="subjectEmail" type="text" placeholder="Enter your email" />
-            <div *ngIf="loginForm.get('subjectEmail')?.invalid && loginForm.get('subjectEmail')?.touched" class="error">
+            <div *ngIf="certificateForm.get('subjectEmail')?.invalid && certificateForm.get('subjectEmail')?.touched" class="error">
                 First and last name required.
             </div>
         </div>
         <div class="form-group">
             <label>Country</label>
             <input formControlName="subjectCountry" type="text" placeholder="Enter your country" />
-            <div *ngIf="loginForm.get('subjectCountry')?.invalid && loginForm.get('subjectCountry')?.touched"
+            <div *ngIf="certificateForm.get('subjectCountry')?.invalid && certificateForm.get('subjectCountry')?.touched"
                 class="error">
                 Country required.
             </div>
@@ -43,7 +43,7 @@
         <div class="form-group">
             <label>Certificate password</label>
             <input formControlName="certificatePassword" type="password" placeholder="Enter password for certificate" />
-            <div *ngIf="loginForm.get('certificatePassword')?.invalid && loginForm.get('certificatePassword')?.touched"
+            <div *ngIf="certificateForm.get('certificatePassword')?.invalid && certificateForm.get('certificatePassword')?.touched"
                 class="error">
                 Password required.
             </div>
@@ -52,7 +52,7 @@
             <label>Certificate valid from</label>
             <input formControlName="certificateValidFrom" type="datetime-local"
                 placeholder="Pick certification start of validating date" />
-            <div *ngIf="loginForm.get('certificateValidFrom')?.invalid && loginForm.get('certificateValidFrom')?.touched"
+            <div *ngIf="certificateForm.get('certificateValidFrom')?.invalid && certificateForm.get('certificateValidFrom')?.touched"
                 class="error">
                 Valid from required.
             </div>
@@ -61,7 +61,7 @@
             <label>Certificate valid to</label>
             <input formControlName="certificateValidTo" type="datetime-local"
                 placeholder="Pick certification end of validating date" />
-            <div *ngIf="loginForm.get('certificateValidTo')?.invalid && loginForm.get('certificateValidTo')?.touched"
+            <div *ngIf="certificateForm.get('certificateValidTo')?.invalid && certificateForm.get('certificateValidTo')?.touched"
                 class="error">
                 Valid to required.
             </div>
@@ -74,7 +74,7 @@
                     {{ certificate.subjectCommonName }} {{ certificate.serialNumber }}
                 </option>
             </select>
-            <div *ngIf="loginForm.get('foundCACertificates')?.invalid && loginForm.get('foundCACertificates')?.touched"
+            <div *ngIf="certificateForm.get('foundCACertificates')?.invalid && certificateForm.get('foundCACertificates')?.touched"
                 class="error">
                 Issuer Certificate required.
             </div>
