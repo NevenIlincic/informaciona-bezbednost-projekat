@@ -107,6 +107,7 @@ public class CertificateController {
     @GetMapping(value = "/non-end-entity")
     public ResponseEntity<List<NonEECertificateDTO>> getAllNonEECertificates(){
         List<Certificate> foundCertificates = certificateService.findNonEECertificates();
+        System.out.println(foundCertificates.size());
         List<NonEECertificateDTO> nonEECertificatesDTO = new ArrayList<>();
         for (Certificate certificate : foundCertificates) {
             nonEECertificatesDTO.add(new NonEECertificateDTO(certificate));

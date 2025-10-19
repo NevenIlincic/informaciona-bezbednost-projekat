@@ -24,4 +24,5 @@ public class IntermediateCertificateDTO {
     private boolean isKeyEncipherment;
     private boolean isServerAuth;
     private boolean isClientAuth;
+    private boolean isAdminCreating;
 }

@@ -10,5 +10,6 @@ export interface IntermediateCertificateDTO {
     isDigitalSignature: boolean,
     isKeyEncipherment: boolean,
     isServerAuth: boolean,
-    isClientAuth: boolean
+    isClientAuth: boolean,
+    isAdminCreating: boolean
 }

@@ -45,7 +45,7 @@ export class CertificateFormPageAdmin {
   }
 
   ngOnInit(): void {
-    this.certificateService.getNonRevokedCACertificates().subscribe({
+    this.certificateService.getNonEECertificates().subscribe({
       next: (certificateList: NonEECertificateDTO[]) => {
         this.nonEECertificatesDTO = certificateList;
       }
@@ -142,7 +142,8 @@ export class CertificateFormPageAdmin {
         isDigitalSignature: this.certificateForm.get('keyUsageDigitalSignature')?.value,
         isKeyEncipherment: this.certificateForm.get('keyUsageKeyEncipherment')?.value,
         isServerAuth: this.certificateForm.get("eKeyUsageServerAuth")?.value,
-        isClientAuth: this.certificateForm.get("eKeyUsageClientAuth")?.value
+        isClientAuth: this.certificateForm.get("eKeyUsageClientAuth")?.value,
+        isAdminCreating: true
       }
       this.certificateService.createIntermediateCertificate(intermediateCertificateDTO).subscribe({
         next: () => {
