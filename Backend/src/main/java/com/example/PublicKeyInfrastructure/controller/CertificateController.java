@@ -62,7 +62,10 @@ public class CertificateController {
             Pcks12DTO pcks12DTO = new Pcks12DTO(encoded, "End_Entity_Certificate");
             return new ResponseEntity<>(pcks12DTO,HttpStatus.CREATED);
         }catch (IllegalArgumentException e){
-            return new ResponseEntity<>(new Pcks12DTO("Invalid", "Invalid"),HttpStatus.BAD_REQUEST);
+//            return new ResponseEntity<>(new Pcks12DTO("Invalid", "Invalid"),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Pcks12DTO(e.getMessage(), "Invalid"),HttpStatus.BAD_REQUEST);
+
+
         }
     }
 

@@ -248,7 +248,6 @@ public class CertificateService {
             issuerData.put("SubjectCountry", issuerCertificate.getSubjectCountry());
             issuerData.put("SubjectEmail", issuerCertificate.getSubjectEmail());
             Organization organization = organizationService.findOrganizationByName(eecertificateDTO.getSubjectOrganizationName());
-            certificate.setOrganization(organization);
             certificate.setIssuerData(issuerData);
             certificate.setCsrPem(null);
             certificate.setIsRevoked(false);
@@ -257,6 +256,7 @@ public class CertificateService {
             certificate.setType(CertificateType.END_ENTITY);
             AuthenticatedUser user = authenticatedUserService.findUserByEmail(eecertificateDTO.getSubjectEmail());
             certificate.setCAuser(user);
+            certificate.setOrganization(user.getOrganization());
             certificate.setIssuerCertificate(issuerCertificate);
             certificate.setValidFrom(eecertificateDTO.getValidFrom());
             certificate.setValidTo(eecertificateDTO.getValidTo());
@@ -279,7 +279,7 @@ public class CertificateService {
             String adminMasterKeyDecrypted = aesUtils.decrypt(adminMasterKey.getMasterKey());
             masterKey = adminMasterKeyDecrypted;
         }else{
-            String issuerOrganizationMasterKeyEncrypted = foundCertificate.getOrganization().getMasterKeyEncrypted();
+            String issuerOrganizationMasterKeyEncrypted = foundCertificate.getIssuerCertificate().getOrganization().getMasterKeyEncrypted();
             String issuerOrganizationMasterKeyDecrypted = aesUtils.decrypt(issuerOrganizationMasterKeyEncrypted);
             masterKey = issuerOrganizationMasterKeyDecrypted;
         }

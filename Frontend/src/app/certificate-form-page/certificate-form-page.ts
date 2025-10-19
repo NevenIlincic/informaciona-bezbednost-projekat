@@ -46,7 +46,6 @@ export class CertificateFormPage implements OnInit {
 
 
   onSubmit() {
-    console.log(this.loginForm.get('certificateValidFrom')?.value);
     if (this.loginForm.invalid) { return; }
     this.isSubmitting = true;
     this.selectedCACertificate = this.loginForm.get("foundCACertificates")?.value;
@@ -74,9 +73,9 @@ export class CertificateFormPage implements OnInit {
       error: (err: HttpErrorResponse) => {
         if (err.status == 400) {
           const errorDTO: Pcks12DTO = err.error;
-          if (errorDTO.encodedPcks12 == "Invalid") {
+          if (errorDTO.fileName == "Invalid") {
             this.isSubmitting = false;
-            this.snackBar.open('Issuer certificate is invalid!', 'I Understand', {
+            this.snackBar.open(errorDTO.encodedPcks12, 'I Understand', {
               duration: undefined,
               verticalPosition: 'bottom',
               panelClass: ["snack-bar-refresh-token-error"]
