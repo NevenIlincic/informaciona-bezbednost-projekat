@@ -71,6 +71,7 @@ public class CertificateService {
 
     public Certificate createIntermediateCertificate(IntermediateCertificateDTO intermediateCertificateDTO){
         Certificate issuerCertificate = findCertificateById(intermediateCertificateDTO.getIssuerCertificateId());
+        System.out.println("MASTER KEY: " + issuerCertificate.getOrganization().getMasterKeyEncrypted());
         certificateValidator.validateCertificateChain(issuerCertificate);
         Certificate certificate = setCertificateAttributes(intermediateCertificateDTO, issuerCertificate);
         PrivateKey issuerPrivateKey = null;

@@ -10,6 +10,7 @@ import { CertificateTabDTO } from '../../dto/certificate/CertificateTabDTO';
 import { DownloadCertificateDTO } from '../../dto/certificate/DownloadCertificateDTO';
 import { NonEECertificateDTO } from '../../dto/certificate/NonEECertificateDTO';
 import { IntermediateCertificateDTO } from '../../dto/certificate/IntermediateCertificateDTO';
+import { CertificateDTO } from '../../dto/certificate/CertificateDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -54,6 +55,10 @@ export class CertificateService {
 
   createIntermediateCertificate(intermediateCertificate: IntermediateCertificateDTO): Observable<null>{
     return this.httpClient.post<null>(this.apiUrl+"/intermediate", intermediateCertificate);
+  }
+
+  createRootCertificate(rootCertificate: CertificateDTO): Observable<null>{
+    return this.httpClient.post<null>(this.apiUrl+"/root", rootCertificate);
   }
 
   getRegularUserCertificates(userEmail: string): Observable<RegularUserCertificateDTO[]>{

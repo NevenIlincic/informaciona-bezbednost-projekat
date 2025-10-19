@@ -4,7 +4,6 @@ export interface CertificateDTO{
     subjectOrganizationalUnit: string,
     subjectCountry: string,
     subjectEmail: string,
-    serialNumber: string, 
     validFrom: string,
     validTo: string,
     isDigitalSignature: boolean,

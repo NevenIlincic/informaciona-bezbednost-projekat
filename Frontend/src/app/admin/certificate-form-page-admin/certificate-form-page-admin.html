@@ -11,7 +11,8 @@
         </div>
         <div class="form-group">
             <label>Organization Name</label>
-            <input formControlName="subjectOrganizationName" type="text" placeholder="Enter organization name" />
+            <input formControlName="subjectOrganizationName" type="text" placeholder="Enter organization name"
+                />
             <div *ngIf="certificateForm.get('subjectOrganizationName')?.invalid && certificateForm.get('subjectOrganizationName')?.touched"
                 class="error">
                 Organization name required.
