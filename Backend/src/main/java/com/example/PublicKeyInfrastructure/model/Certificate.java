@@ -1,5 +1,6 @@
 package com.example.PublicKeyInfrastructure.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -69,6 +70,7 @@ public class Certificate {
     @Column(name = "is_revoked")
     private Boolean isRevoked;
     @Column(name = "revocation_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime revocationDate;
     @Column(name = "revocation_reason")
     private String revocationReason;

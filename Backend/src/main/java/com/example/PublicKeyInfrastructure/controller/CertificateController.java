@@ -65,8 +65,17 @@ public class CertificateController {
         return new ResponseEntity<>(nonRevokedCACertificateDTOList, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/end-entity/user/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<RegularUserCertificateDTO>> getRegularUserCertificate(@PathVariable String email){
+        List<RegularUserCertificateDTO> foundCertificatesDTO = this.certificateService.getRegularUserCertificateDTO(email);
+        return new ResponseEntity<>(foundCertificatesDTO, HttpStatus.OK);
+    }
 
-
+    @DeleteMapping(value = "/revoke")
+    public ResponseEntity<?> revokeCertificate(@RequestBody RevocationDTO revocationDTO){
+        this.certificateService.revokeCertificate(revocationDTO.getId(), revocationDTO.getRevocationReason());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
     private void saveMasterKey(){
         String masterKey = aesUtils.generateMasterKey();
         String encryptedMasterKey = aesUtils.encrypt(masterKey);

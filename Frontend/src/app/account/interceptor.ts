@@ -53,7 +53,6 @@ export class Interceptor implements HttpInterceptor {
                             localStorage.setItem('accessToken', newTokens.accessToken);
                             localStorage.setItem('refreshToken', newTokens.refreshToken);
 
-                            console.log("NOVI ACCESS TOKEN: " + newTokens.accessToken);
                             // ponavljamo originalni zahtev sa novim tokenom    
                             const newRequest = req.clone({
                                 headers: req.headers.set('Authorization', 'Bearer ' + newTokens.accessToken),

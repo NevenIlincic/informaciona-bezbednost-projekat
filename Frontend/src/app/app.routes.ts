@@ -5,6 +5,9 @@ import { ActivationSuccessComponent } from './account/activation-success/activat
 import { ActivationFailureComponent } from './account/activation-failure/activation-failure.component';
 import { HomeComponent } from './home/home/home.component';
 import { CertificateFormPage } from './certificate-form-page/certificate-form-page';
+import { CertificateUser } from './regular-user/certificate-user/certificate-user';
+import { RoutingAuthService } from './authorization/routing-auth-service';
+import { CertificatesTab } from './regular-user/certificates-tab/certificates-tab';
 
 
 export const routes: Routes = [
@@ -14,6 +17,7 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'activation-success', component: ActivationSuccessComponent },
   { path: 'activation-failure', component: ActivationFailureComponent },
-  { path: 'certificate-form-page', component: CertificateFormPage}
+  { path: 'certificate-form-page', component: CertificateFormPage, canActivate: [RoutingAuthService], data: {role: "REGULAR_USER"}},
+  { path: 'user-certificates', component: CertificatesTab, canActivate: [RoutingAuthService], data: {role: "REGULAR_USER"}}
 ];
 
