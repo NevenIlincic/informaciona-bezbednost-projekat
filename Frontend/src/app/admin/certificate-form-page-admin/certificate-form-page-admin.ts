@@ -7,6 +7,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { EECertificateDTO } from '../../../dto/certificate/EECertificateDTO';
 import { Pcks12DTO } from '../../../dto/certificate/Pcks12DTO';
+import { NonEECertificateDTO } from '../../../dto/certificate/NonEECertificateDTO';
+import { ɵEmptyOutletComponent } from "@angular/router";
 
 @Component({
   selector: 'app-certificate-form-page-admin',
@@ -16,8 +18,9 @@ import { Pcks12DTO } from '../../../dto/certificate/Pcks12DTO';
 })
 export class CertificateFormPageAdmin {
   certificateForm: FormGroup;
-  nonRevokedCACertificates: NonRevokedCACertificateDTO[] = [];
-  selectedCACertificate: NonRevokedCACertificateDTO | null = null;
+  nonEECertificatesDTO: NonEECertificateDTO[] = [];
+  selectedCACertificate: NonEECertificateDTO | null = null;
+  certificateTypes: string[] = ["ROOT", "CA", "End-Entity (EE)"]
   isSubmitting = false;
 
   constructor(private formBuilder: FormBuilder, private certificateService: CertificateService, private snackBar: MatSnackBar) {
@@ -30,7 +33,8 @@ export class CertificateFormPageAdmin {
       certificatePassword: ['', Validators.required],
       certificateValidFrom: ['', Validators.required],
       certificateValidTo: ['', Validators.required],
-      foundCACertificates: ['', Validators.required],
+      foundNonEECertficates: ['', Validators.required],
+      certificateTypes: ['', Validators.required],
       keyUsageDigitalSignature: [false],
       keyUsageKeyEncipherment: [false],
       eKeyUsageServerAuth: [false],
@@ -40,10 +44,28 @@ export class CertificateFormPageAdmin {
 
   ngOnInit(): void {
     this.certificateService.getNonRevokedCACertificates().subscribe({
-      next: (certificateList: NonRevokedCACertificateDTO[]) => {
-        this.nonRevokedCACertificates = certificateList;
+      next: (certificateList: NonEECertificateDTO[]) => {
+        this.nonEECertificatesDTO = certificateList;
       }
     });
+    this.certificateForm.get('certificateTypes')!.valueChanges.subscribe(
+        (certificateType: string) => {
+            const issuerControl = this.certificateForm.get('foundNonEECertficates');
+            if (certificateType === 'ROOT') {
+                issuerControl!.clearValidators();
+                issuerControl!.disable();
+                issuerControl!.setValue("ROOT");
+            } else {
+                issuerControl!.setValidators(Validators.required);
+                issuerControl!.enable();
+                if (issuerControl!.getRawValue() == "ROOT"){
+                    issuerControl!.setValue("");
+                }
+            }
+            issuerControl!.updateValueAndValidity();
+  
+        }
+    );
   }
 
 

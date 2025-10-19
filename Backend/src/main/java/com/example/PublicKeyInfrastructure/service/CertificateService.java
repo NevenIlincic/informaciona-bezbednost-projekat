@@ -358,4 +358,8 @@ public class CertificateService {
         return foundCertificatesDTO;
     }
 
+    public List<Certificate> findNonEECertificates(){
+        return this.certificateRepository.returnNonEECertificates(CertificateType.END_ENTITY);
+    }
+
 }

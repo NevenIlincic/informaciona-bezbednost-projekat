@@ -103,6 +103,17 @@ public class CertificateController {
         this.certificateService.revokeCertificate(revocationDTO.getId(), revocationDTO.getRevocationReason());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping(value = "/non-end-entity")
+    public ResponseEntity<List<NonEECertificateDTO>> getAllNonEECertificates(){
+        List<Certificate> foundCertificates = certificateService.findNonEECertificates();
+        List<NonEECertificateDTO> nonEECertificatesDTO = new ArrayList<>();
+        for (Certificate certificate : foundCertificates) {
+            nonEECertificatesDTO.add(new NonEECertificateDTO(certificate));
+        }
+        return new ResponseEntity<>(nonEECertificatesDTO, HttpStatus.OK);
+    }
+
     private void saveMasterKey(){
         String masterKey = aesUtils.generateMasterKey();
         String encryptedMasterKey = aesUtils.encrypt(masterKey);
@@ -111,8 +122,6 @@ public class CertificateController {
 //        adminMasterKeyService.saveMasterKey(adminMasterKey);
     }
 
-//    @GetMapping(value = "/non-end-entity")
-//    public
 
     private void getMasterKey(){
         AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();

@@ -8,6 +8,7 @@ import { RegularUserCertificateDTO } from '../../dto/certificate/RegularUserCert
 import { RevocationDTO } from '../../dto/certificate/RevocationDTO';
 import { CertificateTabDTO } from '../../dto/certificate/CertificateTabDTO';
 import { DownloadCertificateDTO } from '../../dto/certificate/DownloadCertificateDTO';
+import { NonEECertificateDTO } from '../../dto/certificate/NonEECertificateDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -63,5 +64,8 @@ export class CertificateService {
 
   requestCertificateDownload(downloadCertificateDTO: DownloadCertificateDTO): Observable<Pcks12DTO>{
     return this.httpClient.post<Pcks12DTO>(this.apiUrl+"/download", downloadCertificateDTO);
+  }
+  getNonEECertificates(): Observable<NonEECertificateDTO[]>{
+    return this.httpClient.get<NonEECertificateDTO[]>(this.apiUrl+"/non-end-entity");
   }
 }

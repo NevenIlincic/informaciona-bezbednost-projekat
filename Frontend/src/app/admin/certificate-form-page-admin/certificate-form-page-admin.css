@@ -2,7 +2,7 @@
     margin-top: 75px;
     justify-self: center;
     background-color: rgb(142, 174, 203);
-    padding: 30px;
+    padding: 15px;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
@@ -88,3 +88,14 @@ option {
   display: flex;
   flex-direction: row;
 }
+
+.radio-block{
+  display: flex;
+  flex-direction: row;
+  justify-items: start;
+  height: 100%;
+}
+.radio-block input{
+  width: 25px;
+}
+

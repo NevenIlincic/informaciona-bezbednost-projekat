@@ -28,7 +28,8 @@
         <div class="form-group">
             <label>Email</label>
             <input formControlName="subjectEmail" type="text" placeholder="Enter your email" />
-            <div *ngIf="certificateForm.get('subjectEmail')?.invalid && certificateForm.get('subjectEmail')?.touched" class="error">
+            <div *ngIf="certificateForm.get('subjectEmail')?.invalid && certificateForm.get('subjectEmail')?.touched"
+                class="error">
                 First and last name required.
             </div>
         </div>
@@ -68,20 +69,22 @@
         </div>
         <div class="form-group">
             <label>Issuer certificate</label>
-            <select formControlName="foundCACertificates">
-                <option value="" disabled selected>Select CA Certificate to sign with</option>
-                <option *ngFor="let certificate of nonRevokedCACertificates" [ngValue]="certificate">
+            <select formControlName="foundNonEECertficates">
+                <option *ngIf="certificateForm.get('certificateTypes')?.value == 'ROOT'">Self signed</option>
+                <option value="" disabled selected>
+                    Select CA Certificate to sign with</option>
+                <option *ngFor="let certificate of nonEECertificatesDTO" [ngValue]="certificate">
                     {{ certificate.subjectCommonName }} {{ certificate.serialNumber }}
                 </option>
             </select>
-            <div *ngIf="certificateForm.get('foundCACertificates')?.invalid && certificateForm.get('foundCACertificates')?.touched"
+            <div *ngIf="certificateForm.get('foundNonEECertficates')?.invalid && certificateForm.get('foundNonEECertficates')?.touched && certificateForm.get('foundNonEECertficates')?.value != 'ROOT'"
                 class="error">
                 Issuer Certificate required.
             </div>
         </div>
         <div class="form-group">
             <div class="checkbox-block">
-                <label>Key Usage:</label>
+                <label>Key Usage</label>
                 <div class="checkbox-input">
                     <input formControlName="keyUsageDigitalSignature" type="checkbox" />
                     <p>Use for Digital Signature</p>
@@ -94,7 +97,7 @@
         </div>
         <div class="form-group">
             <div class="checkbox-block">
-                <label>Extended Key Usage:</label>
+                <label>Extended Key Usage</label>
                 <div class="checkbox-input">
                     <input formControlName="eKeyUsageServerAuth" type="checkbox" />
                     <p>ServerAuth</p>
@@ -103,6 +106,19 @@
                     <input formControlName="eKeyUsageClientAuth" type="checkbox" />
                     <p>ClientAuth</p>
                 </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Certificate Type</label>
+            <select formControlName="certificateTypes">
+                <option value="" disabled selected>Select Certificate Type</option>
+                <option *ngFor="let certificate of certificateTypes" [ngValue]="certificate">
+                    {{ certificate }}
+                </option>
+            </select>
+            <div *ngIf="certificateForm.get('certificateTypes')?.invalid && certificateForm.get('certificateTypes')?.touched"
+                class="error">
+                Certificate Type required.
             </div>
         </div>
         <button type="submit" class="btn-primary generate-button">
