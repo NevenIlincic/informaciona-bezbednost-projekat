@@ -34,7 +34,7 @@ export class CertificateFormPageAdmin {
       subjectOrganizationalUnit: ['', Validators.required],
       certificatePassword: ['', Validators.required],
       certificateValidFrom: ['', Validators.required],
-      certificateValidTo: ['', Validators.required, this.dateRangeValidator],
+      certificateValidTo: ['', Validators.required],
       foundNonEECertficates: ['', Validators.required],
       certificateTypes: ['', Validators.required],
       keyUsageDigitalSignature: [false],

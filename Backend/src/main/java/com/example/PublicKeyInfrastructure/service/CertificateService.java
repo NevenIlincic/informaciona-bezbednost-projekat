@@ -144,13 +144,31 @@ public class CertificateService {
             String adminMasterKeyDecrypted = aesUtils.decrypt(adminMasterKey.getMasterKey());
             byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), adminMasterKeyDecrypted);
             issuerPrivateKey = rsaUtils.generatePrivateKey(issuerPrivateKeyDecrypted);
-            masterKey = adminMasterKeyDecrypted;
         }else{
-            String issuerOrganizationMasterKeyEncrypted = issuerCertificate.getOrganization().getMasterKeyEncrypted();
-            String issuerOrganizationMasterKeyDecrypted = aesUtils.decrypt(issuerOrganizationMasterKeyEncrypted);
-            byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), issuerOrganizationMasterKeyDecrypted);
+            String decryptionKeyDecrypted = "";
+            if (issuerCertificate.getIssuerCertificate().getType() == CertificateType.ROOT){
+                AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();
+                decryptionKeyDecrypted = aesUtils.decrypt(adminMasterKey.getMasterKey());
+            }else{
+                String issuerOrganizationMasterKeyEncrypted = issuerCertificate.getIssuerCertificate().getOrganization().getMasterKeyEncrypted();
+                decryptionKeyDecrypted = aesUtils.decrypt(issuerOrganizationMasterKeyEncrypted);
+            }
+            byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), decryptionKeyDecrypted);
             issuerPrivateKey = rsaUtils.generatePrivateKey(issuerPrivateKeyDecrypted);
-            masterKey = issuerOrganizationMasterKeyDecrypted;
+        }
+
+        if (!isAdminCreating) {
+            String organizationMasterKeyEncrypted = certificate.getOrganization().getMasterKeyEncrypted();
+            masterKey = aesUtils.decrypt(organizationMasterKeyEncrypted);
+        }else{
+            if (issuerCertificate.getType() != CertificateType.ROOT){
+                String organizationMasterKeyEncrypted = certificate.getIssuerCertificate().getOrganization().getMasterKeyEncrypted();
+                masterKey = aesUtils.decrypt(organizationMasterKeyEncrypted);
+            }else{
+                AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();
+                String adminMasterKeyDecrypted = aesUtils.decrypt(adminMasterKey.getMasterKey());
+                masterKey = adminMasterKeyDecrypted;
+            }
         }
         try {
             KeyPair keyPair = certificateUtils.generateKeyPair();
@@ -304,7 +322,7 @@ public class CertificateService {
             String issuerOrganizationMasterKeyDecrypted = aesUtils.decrypt(issuerOrganizationMasterKeyEncrypted);
             masterKey = issuerOrganizationMasterKeyDecrypted;
         }
-        System.out.println("Private key: " + foundCertificate.getPrivateKey());
+        System.out.println("Private key: " + foundCertificate.getIssuerCertificate());
         byte[] privateKeyBytes = aesUtils.decryptPrivateKey(foundCertificate.getPrivateKey(), masterKey);
         PrivateKey privateKey = rsaUtils.generatePrivateKey(privateKeyBytes);
 
