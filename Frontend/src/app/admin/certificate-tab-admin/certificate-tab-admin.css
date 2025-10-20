@@ -2,3 +2,16 @@
     margin-top: 150px;
     justify-self: center;
 }
+
+.home-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+}
+
+h1 {
+  color: #3f51b5;
+}

@@ -9,17 +9,6 @@ import { AuthService } from './account/auth.service';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements OnInit{
+export class App{
   protected readonly title = signal('frontend-app');
-
-  constructor(private authService: AuthService, private router: Router){
-    
-  }
-  ngOnInit(): void {
-   if (!this.authService.isLoggedIn()){
-    this.router.navigate(["/login"]);
-   }else{
-    this.router.navigate(["/home"]);
-   }
-  }
 }

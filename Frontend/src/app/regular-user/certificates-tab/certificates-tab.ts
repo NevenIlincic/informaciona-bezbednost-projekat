@@ -3,11 +3,11 @@ import { CertificatesList } from '../certificates-list/certificates-list';
 import { CertificateService } from '../../certificate-form-page/certificate-service';
 import { RegularUserCertificateDTO } from '../../../dto/certificate/RegularUserCertificateDTO';
 import { AuthService } from '../../account/auth.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-certificates-tab',
-  imports: [CertificatesList],
+  imports: [CertificatesList, CommonModule],
   templateUrl: './certificates-tab.html',
   styleUrl: './certificates-tab.css'
 })

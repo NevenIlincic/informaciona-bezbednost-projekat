@@ -1,3 +1,8 @@
 <div class="certificates-list">
     <app-certificate-list-admin [certificateList]="allCertificates"></app-certificate-list-admin>
 </div>
+
+<div *ngIf="allCertificates.length == 0" class="home-container">
+  <h1>Welcome to the Home Page</h1>
+  <p>There is no certificates for you to be showed.</p>
+</div>

@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {Router, RouterLink} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { OrganizationService, Organization } from '../../organization/organization.service';
 import { AuthenticatedUserService } from '../authenticatedUser.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-registration',
@@ -85,6 +86,7 @@ export class RegistrationComponent {
       lastName: formValue.lastName,
       email: formValue.email,
       password: formValue.password,
+      repeatedPassword: formValue.repeatPassword,
       organization: selectedOrg
     };
 
@@ -97,9 +99,15 @@ export class RegistrationComponent {
         );
         this.registerForm.reset();
       },
-      error: (err) => {
-        console.error(err);
-        this.snackBar.open('Registration failed. Please try again.', 'Close', { duration: 4000, panelClass: ['snackbar-error'] });
+      error: (err: HttpErrorResponse) => {
+        if (err.error == "Password doesn't meet the requirements!") {
+          this.snackBar.open('Password does not meet the requirements', 'Close', { duration: 4000, panelClass: ['snackbar-error'] });
+
+        } else if (err.error == "Passwords do not match!") {
+          this.snackBar.open('Passwords do not match!', 'Close', { duration: 4000, panelClass: ['snackbar-error'] });
+        } else {
+          this.snackBar.open('Registration failed. Please try again.', 'Close', { duration: 4000, panelClass: ['snackbar-error'] });
+        }
       }
     });
   }

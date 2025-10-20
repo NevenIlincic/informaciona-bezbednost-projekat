@@ -2,6 +2,7 @@
   <div class="form-container">
     <h2>Account successfully activated!</h2>
     <p>Your account has been activated. You can now log in and start using the system.</p>
+    <p *ngIf="loggedIn">Your session has been removed. Please log in again.</p>
     <button routerLink="/login" class="primary-button">Go to Login</button>
   </div>
 </div>
