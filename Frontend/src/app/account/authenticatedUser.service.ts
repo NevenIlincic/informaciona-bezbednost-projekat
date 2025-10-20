@@ -13,4 +13,8 @@ export class AuthenticatedUserService {
   registerUser(userData: any): Observable<void> {
     return this.http.post<void>(this.apiUrl, userData);
   }
+
+  getUserByEmail(email: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${email}`);
+  }
 }

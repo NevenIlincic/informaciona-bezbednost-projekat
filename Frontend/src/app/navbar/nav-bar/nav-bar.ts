@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavbarRegularUser } from '../navbar-regular-user/navbar-regular-user';
+import { NavbarCaUserComponent } from '../navbar-ca-user/navbar-ca-user.component';
 import { AuthService } from '../../account/auth.service';
 import { CommonModule } from '@angular/common';
 import { NavbarAdmin } from "../navbar-admin/navbar-admin";
@@ -7,7 +8,7 @@ import { NavbarAdmin } from "../navbar-admin/navbar-admin";
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [NavbarRegularUser, CommonModule, NavbarAdmin],
+  imports: [NavbarRegularUser, CommonModule, NavbarCaUserComponent, NavbarAdmin],
   templateUrl: './nav-bar.html',
   styleUrl: './nav-bar.css'
 })

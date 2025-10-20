@@ -1,5 +1,6 @@
 package com.example.PublicKeyInfrastructure.dto.template;
 
+import com.example.PublicKeyInfrastructure.dto.authenticatedUser.GetAuthenticatedUserDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.GetCertificateDTO;
 import com.example.PublicKeyInfrastructure.model.Certificate;
@@ -19,7 +20,7 @@ public class GetTemplateDTO {
     private Integer id;
     private String name;
     private Organization organization;
-    private GetCertificateDTO caIssuer;
+    private GetAuthenticatedUserDTO caIssuer;
     private String cnRegex;
     private String sanRegex;
     private Integer maxTtlDays;
@@ -30,7 +31,7 @@ public class GetTemplateDTO {
         id = template.getId();
         name = template.getName();
         organization = template.getOrganization();
-        caIssuer = new GetCertificateDTO(template.getCaIssuer());
+        caIssuer = new GetAuthenticatedUserDTO(template.getCaIssuer());
         cnRegex = template.getCnRegex();
         sanRegex = template.getSanRegex();
         maxTtlDays = template.getMaxTtlDays();

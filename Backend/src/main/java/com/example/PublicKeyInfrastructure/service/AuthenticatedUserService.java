@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +52,10 @@ public class AuthenticatedUserService {
 
     public AuthenticatedUser findUserByEmail(String email) {
         return authenticatedUserRepository.findByEmail(email).orElse(null);
+    }
+
+    public AuthenticatedUser findUserById(int id) {
+        return authenticatedUserRepository.findById(id).orElse(null);
     }
 
     public AuthenticatedUser activateAccount(String tokenEncrypted) {
