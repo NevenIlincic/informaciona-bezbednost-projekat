@@ -13,7 +13,7 @@ import { HttpClientModule } from '@angular/common/http';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
 
   loginForm: FormGroup;
@@ -31,6 +31,12 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()){
+      this.router.navigate(["/home"]);
+    }
+  }
+
   onSubmit(): void {
     if (this.loginForm.invalid) return;
 
@@ -41,7 +47,7 @@ export class LoginComponent {
         this.isSubmitting = false;
         this.snackBar.open('Login successful! Redirecting...', 'Close', {
           duration: 2500,
-          panelClass: ['success-snackbar']
+          panelClass: ['snack-bar-revocation-success']
         });
         this.router.navigate(['/home']);
       },

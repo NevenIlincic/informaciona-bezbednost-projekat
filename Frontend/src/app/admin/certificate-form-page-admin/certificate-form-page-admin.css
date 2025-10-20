@@ -1,12 +1,22 @@
 .certificate-form-block{
     margin-top: 75px;
     justify-self: center;
-    background-color: rgb(142, 174, 203);
+    background-color: white;
     padding: 15px;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     width: 70%;
+}
+
+
+.wrapper {
+  width: 100vw;        /* zauzima celu širinu ekrana */
+  height: 100vh;       /* zauzima celu visinu ekrana */
+  display: flex;       /* centriranje sadržaja unutar wrappera */
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #6b73ff, #000dff);; /* možeš promeniti po želji */
 }
 
 .form-box{

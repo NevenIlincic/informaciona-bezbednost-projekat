@@ -11,6 +11,8 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent } from '@angular/materi
 export class RevokeDialog {
   dialogForm: FormGroup;
 
+  reasonList: string[] = ["Key Compromise", "CA Compromise", "Affiliation Changed", "Superseded", "Cessation of Operation"];
+
   constructor(
     public dialogRef: MatDialogRef<RevokeDialog>,
     @Inject(MAT_DIALOG_DATA) public data: any,

@@ -98,7 +98,7 @@ input:focus, select:focus {
 }
 
 .snackbar-success {
-  background-color: #4caf50 !important;
+  background-color: #4caf50;
   color: white !important;
 }
 
