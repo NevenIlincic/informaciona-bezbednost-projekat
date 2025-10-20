@@ -1,0 +1,118 @@
+<div class="page-wrapper">
+  <div class="form-container">
+    <h2>Create Certificate Template</h2>
+
+    <form [formGroup]="templateForm" (ngSubmit)="onSubmit()">
+
+      <!-- Template name -->
+      <div class="form-group">
+        <label for="name">Template Name</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Enter template name"
+          required
+        />
+        <div *ngIf="templateForm.get('name')?.invalid && templateForm.get('name')?.touched" class="error">
+          Name is required.
+        </div>
+      </div>
+
+      <!-- CN regex -->
+      <div class="form-group">
+        <label for="cnRegex">Common Name (CN) Regex</label>
+        <input
+          id="cnRegex"
+          type="text"
+          formControlName="cnRegex"
+          placeholder="e.g. .*\\.ftn\\.com"
+          required
+        />
+        <div *ngIf="templateForm.get('cnRegex')?.invalid && templateForm.get('cnRegex')?.touched" class="error">
+          CN regex is required.
+        </div>
+      </div>
+
+      <!-- SAN regex -->
+      <div class="form-group">
+        <label for="sanRegex">Subject Alternative Name (SAN) Regex</label>
+        <input
+          id="sanRegex"
+          type="text"
+          formControlName="sanRegex"
+          placeholder="e.g. .*\\.example\\.org"
+          required
+        />
+        <div *ngIf="templateForm.get('sanRegex')?.invalid && templateForm.get('sanRegex')?.touched" class="error">
+          SAN regex is required.
+        </div>
+      </div>
+
+      <!-- TTL -->
+      <div class="form-group">
+        <label for="maxTtlDays">Maximum Validity (days)</label>
+        <input
+          id="maxTtlDays"
+          type="number"
+          formControlName="maxTtlDays"
+          min="1"
+          placeholder="Enter max TTL in days"
+          required
+        />
+        <div *ngIf="templateForm.get('maxTtlDays')?.invalid && templateForm.get('maxTtlDays')?.touched" class="error">
+          TTL must be greater than 0.
+        </div>
+      </div>
+
+      <!-- Key Usage -->
+      <div class="form-group">
+        <label>Default Key Usage</label>
+        <div class="radio-group">
+          <label>
+            <input
+              type="radio"
+              formControlName="defaultKeyUsage"
+              value="Digital Signature"
+            />
+            Digital Signature
+          </label>
+          <label>
+            <input
+              type="radio"
+              formControlName="defaultKeyUsage"
+              value="Key Encipherment"
+            />
+            Key Encipherment
+          </label>
+        </div>
+      </div>
+
+      <!-- Extended Key Usage -->
+      <div class="form-group">
+        <label>Default Extended Key Usage</label>
+        <div class="radio-group">
+          <label>
+            <input
+              type="radio"
+              formControlName="defaultExtendedKeyUsage"
+              value="ServerAuth"
+            />
+            Server Authentication
+          </label>
+          <label>
+            <input
+              type="radio"
+              formControlName="defaultExtendedKeyUsage"
+              value="ClientAuth"
+            />
+            Client Authentication
+          </label>
+        </div>
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" [disabled]="templateForm.invalid">Create Template</button>
+    </form>
+  </div>
+</div>

@@ -24,7 +24,7 @@ public class Template {
     private Organization organization;
     @ManyToOne
     @JoinColumn(name = "ca_issuer_id")
-    private Certificate caIssuer;
+    private AuthenticatedUser caIssuer;
     @Column(name = "cn_regex")
     private String cnRegex;
     @Column(name = "san_regex")
