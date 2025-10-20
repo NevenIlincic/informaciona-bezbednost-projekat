@@ -158,7 +158,7 @@ public class CertificateService {
         }
 
         if (!isAdminCreating) {
-            String organizationMasterKeyEncrypted = certificate.getOrganization().getMasterKeyEncrypted();
+            String organizationMasterKeyEncrypted = certificate.getIssuerCertificate().getOrganization().getMasterKeyEncrypted();
             masterKey = aesUtils.decrypt(organizationMasterKeyEncrypted);
         }else{
             if (issuerCertificate.getType() != CertificateType.ROOT){
