@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class AuthenticatedUserService {
@@ -27,7 +29,8 @@ public class AuthenticatedUserService {
     @Autowired
     private ActivationTokenService activationTokenService;
 
-    public AuthenticatedUser createUser(CreateAuthenticatedUserDTO userToCreate) {
+    public AuthenticatedUser createUser(CreateAuthenticatedUserDTO userToCreate) throws IllegalArgumentException {
+        validatePassword(userToCreate);
         Organization foundOrganization = organizationService.findOrganizationById(userToCreate.getOrganization().getId());
         AuthenticatedUser userToSave = new AuthenticatedUser();
         userToSave.setEmail(userToCreate.getEmail());
@@ -71,5 +74,16 @@ public class AuthenticatedUserService {
 
     private AuthenticatedUser findUserByActivationToken(String token) {
         return authenticatedUserRepository.findByActivationToken(token).orElse(null);
+    }
+
+    private void validatePassword(CreateAuthenticatedUserDTO userToCreate) {
+        Pattern pattern = Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@$!%*?&]).{8,}$");
+        Matcher matcher = pattern.matcher(userToCreate.getPassword());
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("Password doesn't meet the requirements!");
+        }
+        if (!userToCreate.getPassword().equals(userToCreate.getRepeatedPassword())) {
+            throw new IllegalArgumentException("Passwords do not match!");
+        }
     }
 }

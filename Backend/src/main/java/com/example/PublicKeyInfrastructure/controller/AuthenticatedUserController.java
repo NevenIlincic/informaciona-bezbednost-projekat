@@ -18,7 +18,11 @@ public class AuthenticatedUserController {
     private AuthenticatedUserService authenticatedUserService;
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createUser(@RequestBody CreateAuthenticatedUserDTO userToCreate) {
-        authenticatedUserService.createUser(userToCreate);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        try {
+            authenticatedUserService.createUser(userToCreate);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }

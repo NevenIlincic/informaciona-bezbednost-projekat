@@ -13,5 +13,6 @@ public class CreateAuthenticatedUserDTO {
     private String lastName;
     private String email;
     private String password;
+    private String repeatedPassword;
     private RegistrationOrganizationDTO organization;
 }
