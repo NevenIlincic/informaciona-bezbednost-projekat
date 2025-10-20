@@ -1,0 +1,61 @@
+package com.example.PublicKeyInfrastructure.dto.certificate;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class X509CertificateCreationDTO {
+    private String subjectCommonName;
+    private String subjectOrganizationName;
+    private String subjectOrganizationalUnit;
+    private String subjectCountry;
+    private String subjectEmail;
+    private BigInteger serialNumber;
+    private KeyConstraintsDTO keyConstraints;
+    private ExtendedKeyConstaintsDTO extendedKeyConstraints;
+
+    public X509CertificateCreationDTO(CertificateDTO certificateDTO) {
+        this.subjectCommonName = certificateDTO.getSubjectCommonName();
+        this.subjectOrganizationName = certificateDTO.getSubjectOrganizationName();
+        this.subjectOrganizationalUnit = certificateDTO.getSubjectOrganizationalUnit();
+        this.subjectCountry = certificateDTO.getSubjectCountry();
+        this.subjectEmail = certificateDTO.getSubjectEmail();
+        SecureRandom random = new SecureRandom();
+        this.serialNumber = new BigInteger(64, random);
+        this.keyConstraints = new KeyConstraintsDTO(certificateDTO.isDigitalSignature(), certificateDTO.isKeyEncipherment());
+        this.extendedKeyConstraints = new ExtendedKeyConstaintsDTO(certificateDTO.isServerAuth(), certificateDTO.isClientAuth());
+
+    }
+
+    public X509CertificateCreationDTO(IntermediateCertificateDTO certificateDTO) {
+        this.subjectCommonName = certificateDTO.getSubjectCommonName();
+        this.subjectOrganizationName = certificateDTO.getSubjectOrganizationName();
+        this.subjectOrganizationalUnit = certificateDTO.getSubjectOrganizationalUnit();
+        this.subjectCountry = certificateDTO.getSubjectCountry();
+        this.subjectEmail = certificateDTO.getSubjectEmail();
+        SecureRandom random = new SecureRandom();
+        this.serialNumber = new BigInteger(64, random);
+        this.keyConstraints = new KeyConstraintsDTO(certificateDTO.isDigitalSignature(), certificateDTO.isKeyEncipherment());
+        this.extendedKeyConstraints = new ExtendedKeyConstaintsDTO(certificateDTO.isServerAuth(), certificateDTO.isClientAuth());
+
+    }
+    public X509CertificateCreationDTO(EECertificateDTO eeCertificateDTO) {
+        this.subjectCommonName = eeCertificateDTO.getSubjectCommonName();
+        this.subjectOrganizationName = eeCertificateDTO.getSubjectOrganizationName();
+        this.subjectOrganizationalUnit = eeCertificateDTO.getSubjectOrganizationalUnit();
+        this.subjectCountry = eeCertificateDTO.getSubjectCountry();
+        this.subjectEmail = eeCertificateDTO.getSubjectEmail();
+        SecureRandom random = new SecureRandom();
+        // 64-bit random broj, dovoljno za jedinstvenost
+        this.serialNumber = new BigInteger(64, random);
+        this.keyConstraints = new KeyConstraintsDTO(eeCertificateDTO.isDigitalSignature(), eeCertificateDTO.isKeyEncipherment());
+        this.extendedKeyConstraints = new ExtendedKeyConstaintsDTO(eeCertificateDTO.isServerAuth(), eeCertificateDTO.isClientAuth());
+    }
+
+}

@@ -1,11 +1,17 @@
 package com.example.PublicKeyInfrastructure.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
+
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
 @Table(name = "certificates")
@@ -54,8 +60,9 @@ public class Certificate {
     private String subjectCountry;
     @Column(name = "subject_email")
     private String subjectEmail;
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "issuer_data", columnDefinition = "jsonb")
-    private String issuerData;
+    private Map<String, String> issuerData;
     @Column(name = "public_key_pem")
     private String publicKeyPem;
     @Column(name = "csr_pem")
@@ -63,6 +70,7 @@ public class Certificate {
     @Column(name = "is_revoked")
     private Boolean isRevoked;
     @Column(name = "revocation_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime revocationDate;
     @Column(name = "revocation_reason")
     private String revocationReason;

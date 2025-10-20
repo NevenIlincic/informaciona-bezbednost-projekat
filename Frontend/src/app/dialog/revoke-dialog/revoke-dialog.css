@@ -1,0 +1,53 @@
+.dialog{
+    background-color: white;
+    border-radius: 16px;
+    border: solid linear(#6b73ff, #ccc);
+    border-width: 10px;
+    height: 200px;
+    width: 400px;
+    display: block;
+    justify-items: center;
+}
+
+.title{
+    justify-self: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;   /* vertikalno rasporedi elemente */
+  align-items: center;      /* centriraj horizontalno */
+  justify-content: center;  /* centriraj vertikalno (ako želiš) */
+}
+/* .dialog input {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+
+dialog input:focus {
+  border-color: #6b73ff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(107, 115, 255, 0.3);
+} */
+
+input, select {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.btn-primary{
+    position: absolute;
+    width: 25%;
+    bottom: 0;
+    margin-bottom: 15px;
+}

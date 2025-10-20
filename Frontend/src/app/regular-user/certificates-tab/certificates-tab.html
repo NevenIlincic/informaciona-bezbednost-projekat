@@ -1,0 +1,8 @@
+<div class="certificates-list">
+<app-certificates-list [foundCertificates]="userCertificates"></app-certificates-list>
+</div>
+
+<div *ngIf="userCertificates.length == 0" class="home-container">
+  <h1>Welcome to the Home Page</h1>
+  <p>There is no certificates for you to be showed.</p>
+</div>
