@@ -97,7 +97,7 @@ export class CreateCaUserComponent {
           this.snackBar.open(
             'CA User created!',
             'Close',
-            { duration: 5000, panelClass: ['snackbar-success'] }
+            { duration: 5000, panelClass: ['snack-bar-revocation-success'] }
           );
           this.registerForm.reset();
         },

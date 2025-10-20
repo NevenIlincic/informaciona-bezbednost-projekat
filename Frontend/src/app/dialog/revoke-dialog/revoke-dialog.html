@@ -1,12 +1,14 @@
 <div class="dialog">
     <h2 class="title">ENTER REVOCATION REASON</h2>
     <form [formGroup]="dialogForm" (ngSubmit)="sendDataAndClose()" class="form">
-        <input type="text" placeholder="Revocation reason:" formControlName="reasonInput" />
+        <select formControlName="reasonInput">
+            <option *ngFor="let certificate of reasonList" [ngValue]="certificate">
+                {{ certificate }}
+            </option>
+        </select>
         <div *ngIf="dialogForm.get('reasonInput')?.invalid && dialogForm.get('reasonInput')?.touched" class="error">
             Reason required.
         </div>
         <button type="submit" class="btn-primary">CONFIRM</button>
     </form>
-
-
 </div>

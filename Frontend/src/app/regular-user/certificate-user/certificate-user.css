@@ -48,3 +48,6 @@ mat-card-content p{
     font-weight: bold;
 }
 
+button{
+    background-color: red;
+}

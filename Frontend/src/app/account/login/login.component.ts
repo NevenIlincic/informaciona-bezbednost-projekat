@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit {
         this.isSubmitting = false;
         this.snackBar.open('Login successful! Redirecting...', 'Close', {
           duration: 2500,
-          panelClass: ['success-snackbar']
+          panelClass: ['snack-bar-revocation-success']
         });
         this.router.navigate(['/home']);
       },

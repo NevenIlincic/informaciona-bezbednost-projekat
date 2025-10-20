@@ -97,7 +97,7 @@ export class RegistrationComponent {
         this.snackBar.open(
           'Registration successful! An activation email has been sent to your inbox.',
           'Close',
-          { duration: 5000, panelClass: ['snackbar-success'] }
+          { duration: 5000, panelClass: ['snack-bar-revocation-success'] }
         );
         this.registerForm.reset();
       },
