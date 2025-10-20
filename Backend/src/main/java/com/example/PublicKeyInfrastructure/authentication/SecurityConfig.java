@@ -49,6 +49,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Novi način za isključivanje CSRF zaštite
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
+                                .requestMatchers("/api/certificates/**").authenticated()
+                                .requestMatchers("/api/templates/**").hasAuthority("CA_USER")
                                 .anyRequest().permitAll() // Dozvoli sve zahteve bez autentifikacije
                 ).sessionManagement(session -> { // ne koristimo cookie-je
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);

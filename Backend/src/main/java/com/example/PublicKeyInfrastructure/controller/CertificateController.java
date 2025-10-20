@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class CertificateController {
     @Autowired
     private AESUtils aesUtils;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping(value = "/admin")
     public ResponseEntity<List<CertificateTabDTO>> getAllCertificates(){
         try {
@@ -40,6 +42,7 @@ public class CertificateController {
 
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping(value = "/root")
     public ResponseEntity<?> createRootCertificate(@RequestBody CertificateDTO certificateDTO) {
 //        getMasterKey();
@@ -48,12 +51,14 @@ public class CertificateController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CA_USER')")
     @PostMapping(value = "/intermediate", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createIntermediateCertificate(@RequestBody IntermediateCertificateDTO intermediateCertificateDTO){
         certificateService.createIntermediateCertificate(intermediateCertificateDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'REGULAR_USER')")
     @PostMapping(value = "/end-entity", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createEndEntityCertificate(@RequestBody EECertificateDTO eeCertificateDTO, @RequestParam(value = "isAdminCreating") boolean isAdminCreating){
         try{
@@ -97,7 +102,7 @@ public class CertificateController {
             return new ResponseEntity<>(new Pcks12DTO("Invalid", "Invalid"),HttpStatus.BAD_REQUEST);
         }
     }
-
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CA_USER', 'REGULAR_USER')")
     @DeleteMapping(value = "/revoke")
     public ResponseEntity<?> revokeCertificate(@RequestBody RevocationDTO revocationDTO){
         this.certificateService.revokeCertificate(revocationDTO.getId(), revocationDTO.getRevocationReason());
