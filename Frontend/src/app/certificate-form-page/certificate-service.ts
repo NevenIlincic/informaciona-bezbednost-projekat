@@ -73,6 +73,10 @@ export class CertificateService {
     return this.httpClient.get<CertificateTabDTO[]>(this.apiUrl+"/admin");
   }
 
+  getAllCertificatesInChain(email: string): Observable<CertificateTabDTO[]>{
+    return this.httpClient.get<CertificateTabDTO[]>(this.apiUrl+`/ca/${email}`);
+  }
+
   requestCertificateDownload(downloadCertificateDTO: DownloadCertificateDTO): Observable<Pcks12DTO>{
     return this.httpClient.post<Pcks12DTO>(this.apiUrl+"/download", downloadCertificateDTO);
   }
