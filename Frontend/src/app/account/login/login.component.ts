@@ -13,7 +13,7 @@ import { HttpClientModule } from '@angular/common/http';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
 
   loginForm: FormGroup;
@@ -29,6 +29,12 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
+  }
+
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()){
+      this.router.navigate(["/home"]);
+    }
   }
 
   onSubmit(): void {
