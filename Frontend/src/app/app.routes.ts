@@ -20,7 +20,7 @@ export const routes: Routes = [
   { path: 'activation-success', component: ActivationSuccessComponent },
   { path: 'activation-failure', component: ActivationFailureComponent},
   { path: 'certificate-form-page', component: CertificateFormPage, canActivate: [RoutingAuthService], data: {role: ["REGULAR_USER"]}},
-  { path: 'certificate-form-page-admin', component: CertificateFormPageAdmin, canActivate: [RoutingAuthService], data: {role: ["ADMIN"]}}
+  { path: 'certificate-form-page-admin', component: CertificateFormPageAdmin, canActivate: [RoutingAuthService], data: {role: ["ADMIN"]}},
   { path: 'create-template', component: CreateTemplateComponent, canActivate: [RoutingAuthService], data: {role: "CA_USER"} }
 ];
 

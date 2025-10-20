@@ -6,6 +6,7 @@ import com.example.PublicKeyInfrastructure.model.Certificate;
 import com.example.PublicKeyInfrastructure.service.AdminMasterKeyService;
 import com.example.PublicKeyInfrastructure.service.CertificateService;
 import com.example.PublicKeyInfrastructure.utils.AESUtils;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,8 +55,13 @@ public class CertificateController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'CA_USER')")
     @PostMapping(value = "/intermediate", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createIntermediateCertificate(@RequestBody IntermediateCertificateDTO intermediateCertificateDTO){
-        certificateService.createIntermediateCertificate(intermediateCertificateDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+
+        try {
+            certificateService.createIntermediateCertificate(intermediateCertificateDTO);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'REGULAR_USER')")
@@ -112,12 +118,22 @@ public class CertificateController {
     @GetMapping(value = "/non-end-entity")
     public ResponseEntity<List<NonEECertificateDTO>> getAllNonEECertificates(){
         List<Certificate> foundCertificates = certificateService.findNonEECertificates();
-        System.out.println(foundCertificates.size());
         List<NonEECertificateDTO> nonEECertificatesDTO = new ArrayList<>();
         for (Certificate certificate : foundCertificates) {
             nonEECertificatesDTO.add(new NonEECertificateDTO(certificate));
         }
         return new ResponseEntity<>(nonEECertificatesDTO, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('CA_USER')")
+    @GetMapping(value = "/ca/{email}")
+    public ResponseEntity<List<CertificateTabDTO>> getAllCaCertificatesInChain(@PathVariable String email){
+        List<CertificateTabDTO> foundCertificatesDTO = new ArrayList<>();
+        List<Certificate> foundCertificates = this.certificateService.findCACertificatesChain(email);
+        for (Certificate certificate : foundCertificates) {
+            foundCertificatesDTO.add(new CertificateTabDTO(certificate));
+        }
+        return new ResponseEntity<>(foundCertificatesDTO, HttpStatus.OK);
     }
 
     private void saveMasterKey(){

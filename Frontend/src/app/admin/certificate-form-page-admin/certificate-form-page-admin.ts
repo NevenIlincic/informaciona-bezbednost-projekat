@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NonRevokedCACertificateDTO } from '../../../dto/certificate/NonRevokedCACertificateDTO';
 import { CertificateService } from '../../certificate-form-page/certificate-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -34,7 +34,7 @@ export class CertificateFormPageAdmin {
       subjectOrganizationalUnit: ['', Validators.required],
       certificatePassword: ['', Validators.required],
       certificateValidFrom: ['', Validators.required],
-      certificateValidTo: ['', Validators.required],
+      certificateValidTo: ['', Validators.required, this.dateRangeValidator],
       foundNonEECertficates: ['', Validators.required],
       certificateTypes: ['', Validators.required],
       keyUsageDigitalSignature: [false],
@@ -43,6 +43,21 @@ export class CertificateFormPageAdmin {
       eKeyUsageClientAuth: [false]
     });
   }
+
+  dateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const from = control.get('certificateValidFrom')?.value;
+  const to = control.get('certificateValidTo')?.value;
+
+  if (!from || !to) {
+    return null; // ne proverava dok oba nisu popunjena
+  }
+
+  const fromDate = new Date(from);
+  const toDate = new Date(to);
+
+  return fromDate <= toDate ? null : { dateRangeInvalid: true };
+};
+  
 
   ngOnInit(): void {
     this.certificateService.getNonEECertificates().subscribe({
