@@ -1,6 +1,8 @@
 package com.example.PublicKeyInfrastructure.service;
 
+import com.example.PublicKeyInfrastructure.dto.authenticatedUser.GetAuthenticatedUserDTO;
 import com.example.PublicKeyInfrastructure.dto.template.CreateTemplateDTO;
+import com.example.PublicKeyInfrastructure.model.AuthenticatedUser;
 import com.example.PublicKeyInfrastructure.model.Certificate;
 import com.example.PublicKeyInfrastructure.model.Organization;
 import com.example.PublicKeyInfrastructure.model.Template;
@@ -20,18 +22,22 @@ public class TemplateService {
     private OrganizationService organizationService;
 
     @Autowired
-    private CertificateService certificateService;
+    private AuthenticatedUserService userService;
 
     public Collection<Template> findAll() { return templateRepository.findAll(); }
 
     public Template findById(int id) { return templateRepository.findById(id).orElse(null); }
 
+    public Collection<Template> findTemplatesByUser(AuthenticatedUser user) {
+        return templateRepository.findByCaIssuer(user);
+    }
+
     public Template createTemplate(CreateTemplateDTO templateToCreate) {
-        Organization foundOrganization = organizationService.findOrganizationById(templateToCreate.getOrganization().getId());
-        Certificate foundCertificate = certificateService.findCertificateById(templateToCreate.getCaIssuer().getId());
+        Organization foundOrganization = organizationService.findOrganizationById(templateToCreate.getOrganizationId());
+        AuthenticatedUser foundUser = userService.findUserByEmail(templateToCreate.getCaIssuer().getEmail());
         Template template = new Template();
         template.setName(templateToCreate.getName());
-        template.setCaIssuer(foundCertificate);
+        template.setCaIssuer(foundUser);
         template.setOrganization(foundOrganization);
         template.setCnRegex(templateToCreate.getCnRegex());
         template.setSanRegex(templateToCreate.getSanRegex());

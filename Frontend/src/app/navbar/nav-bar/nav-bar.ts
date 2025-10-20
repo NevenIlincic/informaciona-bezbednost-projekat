@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { NavbarRegularUser } from '../navbar-regular-user/navbar-regular-user';
+import { NavbarCaUserComponent } from '../navbar-ca-user/navbar-ca-user.component';
 import { AuthService } from '../../account/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [NavbarRegularUser, CommonModule],
+  imports: [NavbarRegularUser, CommonModule, NavbarCaUserComponent],
   templateUrl: './nav-bar.html',
   styleUrl: './nav-bar.css'
 })
