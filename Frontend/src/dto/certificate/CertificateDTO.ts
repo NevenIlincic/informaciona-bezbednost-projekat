@@ -1,6 +1,4 @@
-export interface EECertificateDTO{
-    issuerCertificateId: number,
-    passwordForCertificate: string,
+export interface CertificateDTO{
     subjectCommonName: string,
     subjectOrganizationName: string,
     subjectOrganizationalUnit: string,

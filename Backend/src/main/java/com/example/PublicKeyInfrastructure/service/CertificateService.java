@@ -7,12 +7,8 @@ import com.example.PublicKeyInfrastructure.utils.AESUtils;
 import com.example.PublicKeyInfrastructure.utils.CertificateUtils;
 import com.example.PublicKeyInfrastructure.utils.CertificateValidator;
 import com.example.PublicKeyInfrastructure.utils.RSAUtils;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -65,6 +61,8 @@ public class CertificateService {
             String certificatePEM = certificateUtils.convertToPem(certificateX509);
             certificate.setPublicKeyPem(publicKeyPem);
             certificate.setCertificatePem(certificatePEM);
+            certificate.setSerialNumber(x509CertificateCreationDTO.getSerialNumber().toString());
+
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -84,12 +82,19 @@ public class CertificateService {
         }else{
             String issuerOrganizationMasterKeyEncrypted = issuerCertificate.getOrganization().getMasterKeyEncrypted();
             String issuerOrganizationMasterKeyDecrypted = aesUtils.decrypt(issuerOrganizationMasterKeyEncrypted);
+            System.out.println("U CREATE: " + issuerOrganizationMasterKeyEncrypted);
+
             byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), issuerOrganizationMasterKeyDecrypted);
             issuerPrivateKey = rsaUtils.generatePrivateKey(issuerPrivateKeyDecrypted);
         }
-
-        String organizationMasterKeyEncrypted = certificate.getOrganization().getMasterKeyEncrypted();
-        String organizationMasterKey = aesUtils.decrypt(organizationMasterKeyEncrypted);
+        String organizationMasterKey = "";
+        if (!intermediateCertificateDTO.isAdminCreating()) {
+            String organizationMasterKeyEncrypted = certificate.getOrganization().getMasterKeyEncrypted();
+            organizationMasterKey = aesUtils.decrypt(organizationMasterKeyEncrypted);
+        }else{
+            String organizationMasterKeyEncrypted = certificate.getIssuerCertificate().getOrganization().getMasterKeyEncrypted();
+            organizationMasterKey = aesUtils.decrypt(organizationMasterKeyEncrypted);
+        }
 
         try {
             KeyPair keyPair = certificateUtils.generateKeyPair();
@@ -105,6 +110,8 @@ public class CertificateService {
             String certificatePEM = certificateUtils.convertToPem(certificateX509);
             certificate.setPublicKeyPem(publicKeyPem);
             certificate.setCertificatePem(certificatePEM);
+            certificate.setSerialNumber(x509CertificateCreationDTO.getSerialNumber().toString());
+
 
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -121,16 +128,19 @@ public class CertificateService {
         certificateValidator.validateCertificateChain(issuerCertificate);
         Certificate certificate = setCertificateAttributes(eecertificateDTO, issuerCertificate);
         PrivateKey issuerPrivateKey = null;
+        String masterKey = "";
         if (issuerCertificate.getType() == CertificateType.ROOT){
             AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();
             String adminMasterKeyDecrypted = aesUtils.decrypt(adminMasterKey.getMasterKey());
             byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), adminMasterKeyDecrypted);
             issuerPrivateKey = rsaUtils.generatePrivateKey(issuerPrivateKeyDecrypted);
+            masterKey = adminMasterKeyDecrypted;
         }else{
             String issuerOrganizationMasterKeyEncrypted = issuerCertificate.getOrganization().getMasterKeyEncrypted();
             String issuerOrganizationMasterKeyDecrypted = aesUtils.decrypt(issuerOrganizationMasterKeyEncrypted);
             byte[] issuerPrivateKeyDecrypted = aesUtils.decryptPrivateKey(issuerCertificate.getPrivateKey(), issuerOrganizationMasterKeyDecrypted);
             issuerPrivateKey = rsaUtils.generatePrivateKey(issuerPrivateKeyDecrypted);
+            masterKey = issuerOrganizationMasterKeyDecrypted;
         }
         try {
             KeyPair keyPair = certificateUtils.generateKeyPair();
@@ -139,7 +149,8 @@ public class CertificateService {
                     Base64.getEncoder().encodeToString(publicKey.getEncoded()) +
                     "\n-----END PUBLIC KEY-----";
             PrivateKey privateKey = keyPair.getPrivate();
-            certificate.setPrivateKey(null);
+            String privateKeyEncrypted = aesUtils.encryptPrivateKey(privateKey, masterKey);
+            certificate.setPrivateKey(privateKeyEncrypted);
             X509CertificateCreationDTO x509CertificateCreationDTO = new X509CertificateCreationDTO(eecertificateDTO);
             X509Certificate certificateX509 = certificateUtils.generateCertificate(x509CertificateCreationDTO, publicKey, issuerPrivateKey, certificate.getIssuerData(), eecertificateDTO.getValidFrom(), eecertificateDTO.getValidTo(), false);
             String certificatePEM = certificateUtils.convertToPem(certificateX509);
@@ -167,14 +178,18 @@ public class CertificateService {
         List<Certificate> foundCertificates = this.certificateRepository.findCertificatesBySubjectEmail(email);
         List<RegularUserCertificateDTO> foundCertificatesDTO = new ArrayList<>();
         for (Certificate certificate : foundCertificates) {
+            System.out.println(certificate.getSerialNumber());
             RegularUserCertificateDTO regularUserCertificateDTO = new RegularUserCertificateDTO(certificate);
             X509Certificate x509Certificate = certificateUtils.pemToX509Certificate(certificate.getCertificatePem());
+
             boolean[] keyUsage = x509Certificate.getKeyUsage();
-            if (keyUsage[0]){
-                regularUserCertificateDTO.setDigitalSignature("Digital Signature");
-            }
-            if (keyUsage[2]){
-                regularUserCertificateDTO.setKeyEncipherment("Key Encipherment");
+            if (keyUsage != null) {
+                if (keyUsage[0]){
+                    regularUserCertificateDTO.setDigitalSignature("Digital Signature");
+                }
+                if (keyUsage[2]){
+                    regularUserCertificateDTO.setKeyEncipherment("Key Encipherment");
+                }
             }
             foundCertificatesDTO.add(regularUserCertificateDTO);
         }
@@ -244,7 +259,6 @@ public class CertificateService {
             issuerData.put("SubjectCountry", issuerCertificate.getSubjectCountry());
             issuerData.put("SubjectEmail", issuerCertificate.getSubjectEmail());
             Organization organization = organizationService.findOrganizationByName(eecertificateDTO.getSubjectOrganizationName());
-            certificate.setOrganization(organization);
             certificate.setIssuerData(issuerData);
             certificate.setCsrPem(null);
             certificate.setIsRevoked(false);
@@ -253,6 +267,7 @@ public class CertificateService {
             certificate.setType(CertificateType.END_ENTITY);
             AuthenticatedUser user = authenticatedUserService.findUserByEmail(eecertificateDTO.getSubjectEmail());
             certificate.setCAuser(user);
+            certificate.setOrganization(user.getOrganization());
             certificate.setIssuerCertificate(issuerCertificate);
             certificate.setValidFrom(eecertificateDTO.getValidFrom());
             certificate.setValidTo(eecertificateDTO.getValidTo());
@@ -265,6 +280,25 @@ public class CertificateService {
 
         }
         return certificate;
+    }
+
+    public byte[] downloadCertificate(DownloadCertificateDTO dto){
+        Certificate foundCertificate = this.certificateRepository.findById(dto.getId()).get();
+        String masterKey = "";
+        if (foundCertificate.getType() == CertificateType.ROOT || foundCertificate.getIssuerCertificate().getOrganization() == null) {
+            AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();
+            String adminMasterKeyDecrypted = aesUtils.decrypt(adminMasterKey.getMasterKey());
+            masterKey = adminMasterKeyDecrypted;
+        }else{
+            String issuerOrganizationMasterKeyEncrypted = foundCertificate.getIssuerCertificate().getOrganization().getMasterKeyEncrypted();
+            String issuerOrganizationMasterKeyDecrypted = aesUtils.decrypt(issuerOrganizationMasterKeyEncrypted);
+            masterKey = issuerOrganizationMasterKeyDecrypted;
+        }
+        System.out.println("Private key: " + foundCertificate.getPrivateKey());
+        byte[] privateKeyBytes = aesUtils.decryptPrivateKey(foundCertificate.getPrivateKey(), masterKey);
+        PrivateKey privateKey = rsaUtils.generatePrivateKey(privateKeyBytes);
+
+        return createPKCS12File(foundCertificate, dto.getPkcs12password(), privateKey);
     }
 
     private byte[] createPKCS12File(Certificate createdCertificate, String password, PrivateKey privateKey) {
@@ -294,4 +328,49 @@ public class CertificateService {
     public void revokeCertificate(int id, String revocationReason){
         this.certificateRepository.revokeCertificate(id, revocationReason, LocalDateTime.now());
     }
+
+    public List<CertificateTabDTO> getAllCertificates() throws Exception{
+        List<Certificate> allCertificates = this.certificateRepository.findAll();
+        List<CertificateTabDTO> foundCertificatesDTO = new ArrayList<>();
+        for (Certificate certificate : allCertificates) {
+            CertificateTabDTO regularUserCertificateDTO = new CertificateTabDTO(certificate);
+            X509Certificate x509Certificate = certificateUtils.pemToX509Certificate(certificate.getCertificatePem());
+            boolean[] keyUsage = x509Certificate.getKeyUsage();
+            if (keyUsage != null) {
+                if (keyUsage[0]){
+                    regularUserCertificateDTO.setDigitalSignature("Digital Signature");
+                }
+                if (keyUsage[2]){
+                    regularUserCertificateDTO.setKeyEncipherment("Key Encipherment");
+                }
+            }
+            //TIP
+            if (certificate.getIssuerCertificate() == null){
+                regularUserCertificateDTO.setType("ROOT");
+            }else{
+                if (x509Certificate.getBasicConstraints() == -1){
+                    regularUserCertificateDTO.setType("END-ENTITY");
+                }else{
+                    regularUserCertificateDTO.setType("CA");
+                }
+            }
+            //Extended Key Usage Constraints
+            List<String> ekuOids = x509Certificate.getExtendedKeyUsage();
+            if (ekuOids != null) {
+                if (ekuOids.contains("1.3.6.1.5.5.7.3.1")) {
+                    regularUserCertificateDTO.setServerAuth("Server Auth");
+                }
+                if (ekuOids.contains("1.3.6.1.5.5.7.3.2")) {
+                   regularUserCertificateDTO.setClientAuth("Client Auth");
+                }
+            }
+            foundCertificatesDTO.add(regularUserCertificateDTO);
+        }
+        return foundCertificatesDTO;
+    }
+
+    public List<Certificate> findNonEECertificates(){
+        return this.certificateRepository.returnNonEECertificates(CertificateType.END_ENTITY);
+    }
+
 }

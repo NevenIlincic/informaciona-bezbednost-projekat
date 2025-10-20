@@ -1,0 +1,65 @@
+<mat-card class="card">
+    <mat-card-header class="header">
+        <p>{{singleCertificate.subjectCommonName}}</p>
+    </mat-card-header>
+
+    <mat-card-content class="content">
+        <p class="label-text">CN:</p>
+        <p class="value-text">{{singleCertificate.subjectCommonName}}</p>
+
+        <p class="label-text">O:</p>
+        <p class="value-text">{{singleCertificate.subjectOrganizationName}}</p>
+
+        <p class="label-text">OI:</p>
+        <p class="value-text">{{singleCertificate.subjectOrganizationalUnit}}</p>
+        
+        <p class="label-text">E:</p>
+        <p class="value-text">{{singleCertificate.subjectEmail}}</p>
+
+        <p class="label-text">C:</p>
+        <p class="value-text">{{singleCertificate.subjectCountry}}</p>
+
+        <p class="label-text">Serial number:</p>
+        <p class="value-text">{{singleCertificate.serialNumber}}</p>
+
+        <p class="label-text">Valid from:</p>
+        <p class="value-text">{{singleCertificate.validFrom | date:'dd.MM.yyyy.'}}</p>
+
+        <p class="label-text">Valid to:</p>
+        <p class="value-text">{{singleCertificate.validTo | date: 'dd.MM.yyyy.'}}</p>
+
+        <p class="label-text">Type:</p>
+        <p class="value-text">{{singleCertificate.type}}</p>
+
+        <p class="label-text key-constraints-label">Key usage constraints:</p> 
+        
+        <div class="value-text key-constraints-value">
+            <p *ngIf="keyConstraints.length == 0">None</p>
+            <ng-container *ngIf="keyConstraints.length != 0">
+                <p *ngFor="let constraint of keyConstraints">{{constraint}}</p>
+            </ng-container>
+        </div>
+        <!-- EXTENTED KEY USAGE COSNTRIANT-->
+        <p class="label-text key-constraints-label">Extended key usage constraints:</p> 
+        
+        <div class="value-text key-constraints-value">
+            <p *ngIf="extentedKeyConstraints.length == 0">None</p>
+            <ng-container *ngIf="extentedKeyConstraints.length != 0">
+                <p *ngFor="let constraint of extentedKeyConstraints">{{constraint}}</p>
+            </ng-container>
+        </div>
+
+        <ng-container *ngIf="singleCertificate.revoked">
+            <p class="label-text">Revocation date:</p>
+            <p class="value-text">{{revocationDate | date: 'dd.MM.yyyy.'}}</p>
+
+            <p class="label-text">Revocation reason:</p>
+            <p class="value-text">{{singleCertificate.revocationReason}}</p>
+        </ng-container>
+        
+    </mat-card-content>
+    <mat-card-footer>
+        <button class="btn-primary" (click)="openDownloadDialog(singleCertificate.id)"> DOWNLOAD </button>
+        <button *ngIf="!singleCertificate.revoked" class="btn-primary" (click)="openRevokeDialog(singleCertificate.id)" style="background-color: red;"> REVOKE </button>
+    </mat-card-footer>
+</mat-card>

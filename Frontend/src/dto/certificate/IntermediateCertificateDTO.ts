@@ -1,6 +1,5 @@
-export interface EECertificateDTO{
+export interface IntermediateCertificateDTO {
     issuerCertificateId: number,
-    passwordForCertificate: string,
     subjectCommonName: string,
     subjectOrganizationName: string,
     subjectOrganizationalUnit: string,
@@ -11,5 +10,6 @@ export interface EECertificateDTO{
     isDigitalSignature: boolean,
     isKeyEncipherment: boolean,
     isServerAuth: boolean,
-    isClientAuth: boolean
+    isClientAuth: boolean,
+    isAdminCreating: boolean
 }

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../account/auth.service';
 import { ɵEmptyOutletComponent } from "@angular/router";
 import { CertificatesTab } from "../../regular-user/certificates-tab/certificates-tab";
+import { CertificateTabAdmin } from "../../admin/certificate-tab-admin/certificate-tab-admin";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, CertificatesTab],
+  imports: [CommonModule, CertificatesTab, CertificateTabAdmin],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })

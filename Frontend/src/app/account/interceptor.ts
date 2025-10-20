@@ -60,16 +60,18 @@ export class Interceptor implements HttpInterceptor {
                             return next.handle(newRequest);
                         }),
                         catchError((err: HttpErrorResponse) => {
-                            this.isRefreshing = false;
-                            const snack = this.snackBar.open('Session has expired! Please login again!', 'OK', {
-                                duration: undefined,
-                                verticalPosition: 'bottom',
-                                panelClass: ["snack-bar-refresh-token-error"]
-                            });
-                            snack.onAction().subscribe(() => {
-                                this.authService.logout();
-                                this.router.navigate(['/login']);
-                            });
+                            if (err.status == 401) {
+                                this.isRefreshing = false;
+                                const snack = this.snackBar.open('Session has expired! Please login again!', 'OK', {
+                                    duration: undefined,
+                                    verticalPosition: 'bottom',
+                                    panelClass: ["snack-bar-refresh-token-error"]
+                                });
+                                snack.onAction().subscribe(() => {
+                                    this.authService.logout();
+                                    this.router.navigate(['/login']);
+                                });
+                            }
 
 
 

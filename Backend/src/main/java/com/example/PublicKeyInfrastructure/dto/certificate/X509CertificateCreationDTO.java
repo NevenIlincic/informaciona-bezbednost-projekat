@@ -18,6 +18,7 @@ public class X509CertificateCreationDTO {
     private String subjectEmail;
     private BigInteger serialNumber;
     private KeyConstraintsDTO keyConstraints;
+    private ExtendedKeyConstaintsDTO extendedKeyConstraints;
 
     public X509CertificateCreationDTO(CertificateDTO certificateDTO) {
         this.subjectCommonName = certificateDTO.getSubjectCommonName();
@@ -25,7 +26,11 @@ public class X509CertificateCreationDTO {
         this.subjectOrganizationalUnit = certificateDTO.getSubjectOrganizationalUnit();
         this.subjectCountry = certificateDTO.getSubjectCountry();
         this.subjectEmail = certificateDTO.getSubjectEmail();
-        this.serialNumber = new BigInteger(certificateDTO.getSerialNumber());
+        SecureRandom random = new SecureRandom();
+        this.serialNumber = new BigInteger(64, random);
+        this.keyConstraints = new KeyConstraintsDTO(certificateDTO.isDigitalSignature(), certificateDTO.isKeyEncipherment());
+        this.extendedKeyConstraints = new ExtendedKeyConstaintsDTO(certificateDTO.isServerAuth(), certificateDTO.isClientAuth());
+
     }
 
     public X509CertificateCreationDTO(IntermediateCertificateDTO certificateDTO) {
@@ -34,7 +39,11 @@ public class X509CertificateCreationDTO {
         this.subjectOrganizationalUnit = certificateDTO.getSubjectOrganizationalUnit();
         this.subjectCountry = certificateDTO.getSubjectCountry();
         this.subjectEmail = certificateDTO.getSubjectEmail();
-        this.serialNumber = new BigInteger(certificateDTO.getSerialNumber());
+        SecureRandom random = new SecureRandom();
+        this.serialNumber = new BigInteger(64, random);
+        this.keyConstraints = new KeyConstraintsDTO(certificateDTO.isDigitalSignature(), certificateDTO.isKeyEncipherment());
+        this.extendedKeyConstraints = new ExtendedKeyConstaintsDTO(certificateDTO.isServerAuth(), certificateDTO.isClientAuth());
+
     }
     public X509CertificateCreationDTO(EECertificateDTO eeCertificateDTO) {
         this.subjectCommonName = eeCertificateDTO.getSubjectCommonName();
@@ -46,6 +55,7 @@ public class X509CertificateCreationDTO {
         // 64-bit random broj, dovoljno za jedinstvenost
         this.serialNumber = new BigInteger(64, random);
         this.keyConstraints = new KeyConstraintsDTO(eeCertificateDTO.isDigitalSignature(), eeCertificateDTO.isKeyEncipherment());
+        this.extendedKeyConstraints = new ExtendedKeyConstaintsDTO(eeCertificateDTO.isServerAuth(), eeCertificateDTO.isClientAuth());
     }
 
 }

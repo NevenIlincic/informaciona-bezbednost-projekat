@@ -22,4 +22,6 @@ public class EECertificateDTO {
     private LocalDateTime validTo;
     private boolean isDigitalSignature;
     private boolean isKeyEncipherment;
+    private boolean isServerAuth;
+    private boolean isClientAuth;
 }
