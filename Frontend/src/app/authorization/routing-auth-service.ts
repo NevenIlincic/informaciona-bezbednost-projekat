@@ -12,7 +12,7 @@ export class RoutingAuthService implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    const userRole: string = this.authService.user$.value;
+    const userRole: string = this.authService.user$.getValue();
     if (userRole == null || userRole == ""){
       this.router.navigate(["/login"]);
       return false;
@@ -22,6 +22,7 @@ export class RoutingAuthService implements CanActivate {
       return false;
     }
     return true;
+  
   }
   
 }

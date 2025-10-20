@@ -20,7 +20,6 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.role = this.authService.getRole();
-    console.log(this.role);
   }
 
 }

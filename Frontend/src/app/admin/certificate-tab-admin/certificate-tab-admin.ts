@@ -20,7 +20,6 @@ export class CertificateTabAdmin {
     this.certificateService.getAllCertificatesAdmin().subscribe({
       next: (foundCertificates: CertificateTabDTO[]) => {
         this.allCertificates = foundCertificates;
-        console.log(this.allCertificates);
       }
     });
   }

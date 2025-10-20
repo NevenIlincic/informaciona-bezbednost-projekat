@@ -2,6 +2,7 @@
   <div class="form-container">
     <h2>Activation failed</h2>
     <p>We couldn’t activate your account. The activation link may have expired or already been used.</p>
+    <p *ngIf="loggedIn">Your session has been removed. Please log in again.</p>
     <button routerLink="/register" class="secondary-button">Go to Registration</button>
   </div>
 </div>

@@ -24,6 +24,8 @@ public class AuthenticatedUserService {
     @Autowired EmailService emailService;
     @Autowired
     private AESUtils aesUtils;
+    @Autowired
+    private ActivationTokenService activationTokenService;
 
     public AuthenticatedUser createUser(CreateAuthenticatedUserDTO userToCreate) {
         Organization foundOrganization = organizationService.findOrganizationById(userToCreate.getOrganization().getId());
@@ -50,6 +52,10 @@ public class AuthenticatedUserService {
 
     public AuthenticatedUser activateAccount(String tokenEncrypted) {
         String token = aesUtils.decrypt(tokenEncrypted);
+
+        if (activationTokenService.getByActivationToken(token) != null) {
+            return null;
+        }
         AuthenticatedUser userToActivate = findUserByActivationToken(token);
         if (userToActivate.getTokenExpiry().isBefore(LocalDateTime.now())) {
             return null;
@@ -59,6 +65,7 @@ public class AuthenticatedUserService {
         }
         userToActivate.setIsActive(true);
         authenticatedUserRepository.save(userToActivate);
+        this.activationTokenService.saveToken(token);
         return userToActivate;
     }
 
