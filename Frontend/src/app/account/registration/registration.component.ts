@@ -7,6 +7,7 @@ import { OrganizationService, Organization } from '../../organization/organizati
 import { AuthenticatedUserService } from '../authenticatedUser.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Role } from '../role';
 
 @Component({
   selector: 'app-registration',
@@ -87,7 +88,8 @@ export class RegistrationComponent {
       email: formValue.email,
       password: formValue.password,
       repeatedPassword: formValue.repeatPassword,
-      organization: selectedOrg
+      organization: selectedOrg,
+      role: Role.REGULAR_USER
     };
 
     this.authService.registerUser(userData).subscribe({
