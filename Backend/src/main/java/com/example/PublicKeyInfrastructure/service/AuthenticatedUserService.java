@@ -50,6 +50,25 @@ public class AuthenticatedUserService {
         return authenticatedUserRepository.save(userToSave);
     }
 
+    public AuthenticatedUser createCaUser(CreateAuthenticatedUserDTO userToCreate) throws IllegalArgumentException {
+        validatePassword(userToCreate);
+        Organization foundOrganization = organizationService.findOrganizationById(userToCreate.getOrganization().getId());
+        AuthenticatedUser userToSave = new AuthenticatedUser();
+        userToSave.setEmail(userToCreate.getEmail());
+        userToSave.setFirstName(userToCreate.getFirstName());
+        userToSave.setLastName(userToCreate.getLastName());
+        userToSave.setRole(Role.CA_USER);
+        userToSave.setOrganization(foundOrganization);
+        userToSave.setPassword(passwordEncoder.encode(userToCreate.getPassword()));
+        userToSave.setIsActive(true);
+
+        String activationToken = UUID.randomUUID().toString();
+        userToSave.setActivationToken(activationToken);
+        userToSave.setTokenExpiry(LocalDateTime.now().plusHours(24));
+
+        return authenticatedUserRepository.save(userToSave);
+    }
+
     public AuthenticatedUser findUserByEmail(String email) {
         return authenticatedUserRepository.findByEmail(email).orElse(null);
     }

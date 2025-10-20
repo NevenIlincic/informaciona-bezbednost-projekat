@@ -29,6 +29,17 @@ public class AuthenticatedUserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    
+    @PostMapping(value = "/ca", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createCaUser(@RequestBody CreateAuthenticatedUserDTO userToCreate) {
+        try {
+            authenticatedUserService.createCaUser(userToCreate);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    
 
     @GetMapping(value = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetAuthenticatedUserDTO> getUserByEmail(@PathVariable("email") String email) {
