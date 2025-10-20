@@ -1,0 +1,20 @@
+.navbar{
+    background: linear-gradient(135deg, #6b73ff, #000dff);
+    display: block;
+    width: inherit;
+    height: 75px;
+    padding-left: 50px;
+    align-content: center;
+}
+
+.navbar-item{
+    color: white;
+    font-weight: bold;
+    display: inline-block;
+    margin-left: 30px;
+}
+
+.navbar-item:hover{
+    cursor: pointer;
+    color: #9495b2;
+}

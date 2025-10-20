@@ -1,50 +1,6 @@
-<!-- <mat-card class="card">
-    <mat-card-header class="header">
-        <p>CERTIFICATE</p>
-    </mat-card-header>
-
-    <mat-card-content class="content">
-        <div class="labels">
-            <p>CN:</p>
-            <p>O:</p>
-            <p>OI:</p>
-            <p>E:</p>
-            <p>C:</p>
-            <p>Serial number:</p>
-            <p>Valid from:</p>
-            <p>Valid to:</p>
-            <p>Key constraints:</p>
-            <p *ngIf="userCertificate.revoked">Revocation date:</p>
-            <p *ngIf="userCertificate.revoked">Revocation reason:</p>
-        </div>
-        <div class="values">
-            <p>{{userCertificate.subjectOrganizationName}}</p>
-            <p>{{userCertificate.subjectOrganizationName}}</p>
-            <p>{{userCertificate.subjectOrganizationalUnit}}</p>
-            <p>{{userCertificate.subjectEmail}}</p>
-            <p>{{userCertificate.subjectCountry}}</p>
-            <p>{{userCertificate.serialNumber}}</p>
-            <p>{{userCertificate.validFrom | date:'dd.MM.yyyy.'}}</p>
-            <p>{{userCertificate.validTo | date: 'dd.MM.yyyy.'}}</p>
-            <div *ngIf="keyConstraints.length == 0">
-                <p>None</p>
-            </div>
-            <div *ngIf="keyConstraints.length != 0">
-                <ng-container *ngFor="let contraint of keyConstraints">
-                    <p>{{contraint}}</p>
-                </ng-container>
-            </div>
-            <p *ngIf="userCertificate.revoked">{{revocationDate | date: 'dd.MM.yyyy.'}}</p>
-            <p *ngIf="userCertificate.revoked">{{userCertificate.revocationReason}}</p>
-        </div>
-    </mat-card-content>
-    <mat-card-footer *ngIf="!userCertificate.revoked">
-        <button class="btn-primary" (click)="revokeCertificate(userCertificate.id)"> REVOKE </button>
-    </mat-card-footer>
-</mat-card> -->
 <mat-card class="card">
     <mat-card-header class="header">
-        <p>CERTIFICATE</p>
+        <p>{{userCertificate.subjectOrganizationName}}</p>
     </mat-card-header>
 
     <mat-card-content class="content">

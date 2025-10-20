@@ -1,0 +1,12 @@
+<div class="dialog">
+    <h2 class="title">PASSWORD FOR FILE ACCESS</h2>
+    <form [formGroup]="dialogForm" (ngSubmit)="sendDataAndClose()" class="form">
+        <input type="password" placeholder="Enter password:" formControlName="passwordInput" />
+        <div *ngIf="dialogForm.get('passwordInput')?.invalid && dialogForm.get('passwordInput')?.touched" class="error">
+            Password required.
+        </div>
+        <button type="submit" class="btn-primary">CONFIRM</button>
+    </form>
+
+
+</div>

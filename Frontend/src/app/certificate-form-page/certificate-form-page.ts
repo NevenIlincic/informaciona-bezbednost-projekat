@@ -32,7 +32,9 @@ export class CertificateFormPage implements OnInit {
       certificateValidTo: ['', Validators.required],
       foundCACertificates: ['', Validators.required],
       keyUsageDigitalSignature: [false],
-      keyUsageKeyEncipherment: [false]
+      keyUsageKeyEncipherment: [false],
+      eKeyUsageServerAuth: [false],
+      eKeyUsageClientAuth: [false]
     });
   }
 
@@ -46,7 +48,6 @@ export class CertificateFormPage implements OnInit {
 
 
   onSubmit() {
-    console.log(this.loginForm.get('certificateValidFrom')?.value);
     if (this.loginForm.invalid) { return; }
     this.isSubmitting = true;
     this.selectedCACertificate = this.loginForm.get("foundCACertificates")?.value;
@@ -62,39 +63,22 @@ export class CertificateFormPage implements OnInit {
       validFrom: this.loginForm.get('certificateValidFrom')?.value,
       validTo: this.loginForm.get('certificateValidTo')?.value,
       isDigitalSignature: this.loginForm.get('keyUsageDigitalSignature')?.value,
-      isKeyEncipherment: this.loginForm.get('keyUsageKeyEncipherment')?.value
-
+      isKeyEncipherment: this.loginForm.get('keyUsageKeyEncipherment')?.value,
+      isServerAuth: this.loginForm.get("eKeyUsageServerAuth")?.value,
+      isClientAuth: this.loginForm.get("eKeyUsageClientAuth")?.value
     }
 
-    this.certificateService.createEECertificateRegularUser(eeCertificateDTO).subscribe({
+    this.certificateService.createEECertificateRegularUser(eeCertificateDTO, 'false').subscribe({
       next: (pcksDTO: Pcks12DTO) => {
-        // Decode Base64 u binarni array
-        const binary = atob(pcksDTO.encodedPcks12);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-          bytes[i] = binary.charCodeAt(i);
-        }
-
-        // Kreiramo Blob i URL za download
-        const blob = new Blob([bytes], { type: 'application/x-pkcs12' });
-        const url = window.URL.createObjectURL(blob);
-
-        // Automatski download
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = pcksDTO.fileName;
-        a.click();
-
-        window.URL.revokeObjectURL(url);
+        this.certificateService.downloadCertificate(pcksDTO);
         this.isSubmitting = false;
-
       },
       error: (err: HttpErrorResponse) => {
         if (err.status == 400) {
           const errorDTO: Pcks12DTO = err.error;
-          if (errorDTO.encodedPcks12 == "Invalid") {
+          if (errorDTO.fileName == "Invalid") {
             this.isSubmitting = false;
-            this.snackBar.open('Issuer certificate is invalid!', 'I Understand', {
+            this.snackBar.open(errorDTO.encodedPcks12, 'I Understand', {
               duration: undefined,
               verticalPosition: 'bottom',
               panelClass: ["snack-bar-refresh-token-error"]

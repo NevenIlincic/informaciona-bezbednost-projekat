@@ -1,6 +1,7 @@
 package com.example.PublicKeyInfrastructure.utils;
 
 import com.example.PublicKeyInfrastructure.dto.certificate.CertificateDTO;
+import com.example.PublicKeyInfrastructure.dto.certificate.ExtendedKeyConstaintsDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.KeyConstraintsDTO;
 import com.example.PublicKeyInfrastructure.dto.certificate.X509CertificateCreationDTO;
 import com.example.PublicKeyInfrastructure.model.Certificate;
@@ -74,7 +75,8 @@ public class CertificateUtils {
                     notAfter,
                     certificateDTO.getSerialNumber(),
                     isCACertificate,
-                    certificateDTO.getKeyConstraints()
+                    certificateDTO.getKeyConstraints(),
+                    certificateDTO.getExtendedKeyConstraints()
             );
             return certificate;
         } catch (Exception e){
@@ -99,7 +101,8 @@ public class CertificateUtils {
                                               Date notAfter,
                                               BigInteger serialNumber,
                                               boolean isCACertificate,
-                                              KeyConstraintsDTO keyConstraints) throws Exception {
+                                              KeyConstraintsDTO keyConstraints,
+                                              ExtendedKeyConstaintsDTO extendedKeyConstaints) throws Exception {
 
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuer,
@@ -121,11 +124,9 @@ public class CertificateUtils {
             certBuilder = setKeyConstraints(certBuilder, keyConstraints);
         }
 
-//        certBuilder.addExtension(
-//                Extension.extendedKeyUsage,
-//                false,
-//                new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth)
-//        );
+        if (extendedKeyConstaints != null && (extendedKeyConstaints.isClientAuth() || extendedKeyConstaints.isServerAuth())){
+            certBuilder = setExtendedKeyConstraints(certBuilder, extendedKeyConstaints);
+        }
 
         // Potpisivanje sertifikata privatnim ključem izdavaoca
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
@@ -160,6 +161,35 @@ public class CertificateUtils {
         }
         return newCertBuilder;
     }
+
+    private X509v3CertificateBuilder setExtendedKeyConstraints(X509v3CertificateBuilder certBuilder ,ExtendedKeyConstaintsDTO extendedKeyConstaints) throws Exception {
+        X509v3CertificateBuilder newCertBuilder = certBuilder;
+        if (extendedKeyConstaints.isServerAuth() && extendedKeyConstaints.isClientAuth()) {
+            KeyPurposeId[] usages = new KeyPurposeId[]{
+                    KeyPurposeId.id_kp_serverAuth,
+                    KeyPurposeId.id_kp_clientAuth
+            };
+            certBuilder.addExtension(
+                    Extension.extendedKeyUsage,
+                    false,
+                    new ExtendedKeyUsage(usages)
+            );
+        }else if (!extendedKeyConstaints.isServerAuth() && extendedKeyConstaints.isClientAuth()){
+            certBuilder.addExtension(
+                    Extension.extendedKeyUsage,
+                    false,
+                    new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth)
+            );
+        }else{
+            certBuilder.addExtension(
+                    Extension.extendedKeyUsage,
+                    false,
+                    new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth)
+            );
+        }
+        return newCertBuilder;
+    }
+
 
     public X509Certificate pemToX509Certificate(String pem) {
         try {
@@ -210,6 +240,5 @@ public class CertificateUtils {
             createdCertficate = createdCertficate.getIssuerCertificate();
         }
         return certList;
-
     }
 }

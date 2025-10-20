@@ -1,5 +1,8 @@
 
 <!-- <app-navbar-regular-user></app-navbar-regular-user> -->
+<div *ngIf="role == 'ADMIN'">
+  <app-certificate-tab-admin></app-certificate-tab-admin>
+</div>
 <div *ngIf="role == 'REGULAR_USER'">
   <app-certificates-tab></app-certificates-tab>
 </div>

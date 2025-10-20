@@ -28,4 +28,8 @@ public interface CertificateRepository extends JpaRepository<Certificate, Intege
             "c.revocationDate = :date " +
             "WHERE c.id = :id")
     void revokeCertificate(@Param("id") int id, @Param("reason") String revocationReason, @Param("date")LocalDateTime revocationDate);
+
+    @Query("SELECT e FROM Certificate e " +
+            "WHERE e.type != :certificateType AND e.isRevoked = false")
+    List<Certificate> returnNonEECertificates(CertificateType certificateType);
 }

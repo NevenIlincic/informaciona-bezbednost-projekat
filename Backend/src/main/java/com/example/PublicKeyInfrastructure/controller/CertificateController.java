@@ -28,6 +28,18 @@ public class CertificateController {
     @Autowired
     private AESUtils aesUtils;
 
+    @GetMapping(value = "/admin")
+    public ResponseEntity<List<CertificateTabDTO>> getAllCertificates(){
+        try {
+            List<CertificateTabDTO> certificateTabDTOS = this.certificateService.getAllCertificates();
+            return new ResponseEntity<>(certificateTabDTOS, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     @PostMapping(value = "/root")
     public ResponseEntity<?> createRootCertificate(@RequestBody CertificateDTO certificateDTO) {
 //        getMasterKey();
@@ -50,7 +62,10 @@ public class CertificateController {
             Pcks12DTO pcks12DTO = new Pcks12DTO(encoded, "End_Entity_Certificate");
             return new ResponseEntity<>(pcks12DTO,HttpStatus.CREATED);
         }catch (IllegalArgumentException e){
-            return new ResponseEntity<>(new Pcks12DTO("Invalid", "Invalid"),HttpStatus.BAD_REQUEST);
+//            return new ResponseEntity<>(new Pcks12DTO("Invalid", "Invalid"),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Pcks12DTO(e.getMessage(), "Invalid"),HttpStatus.BAD_REQUEST);
+
+
         }
     }
 
@@ -71,11 +86,35 @@ public class CertificateController {
         return new ResponseEntity<>(foundCertificatesDTO, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/download")
+    public ResponseEntity<Pcks12DTO> downloadCertificate(@RequestBody DownloadCertificateDTO downloadCertificateDTO){
+        try{
+            byte[] pcks12bytes = certificateService.downloadCertificate(downloadCertificateDTO);
+            String encoded =  Base64.getEncoder().encodeToString(pcks12bytes);
+            Pcks12DTO pcks12DTO = new Pcks12DTO(encoded, "Downloaded Certificate");
+            return new ResponseEntity<>(pcks12DTO,HttpStatus.OK);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(new Pcks12DTO("Invalid", "Invalid"),HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @DeleteMapping(value = "/revoke")
     public ResponseEntity<?> revokeCertificate(@RequestBody RevocationDTO revocationDTO){
         this.certificateService.revokeCertificate(revocationDTO.getId(), revocationDTO.getRevocationReason());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping(value = "/non-end-entity")
+    public ResponseEntity<List<NonEECertificateDTO>> getAllNonEECertificates(){
+        List<Certificate> foundCertificates = certificateService.findNonEECertificates();
+        System.out.println(foundCertificates.size());
+        List<NonEECertificateDTO> nonEECertificatesDTO = new ArrayList<>();
+        for (Certificate certificate : foundCertificates) {
+            nonEECertificatesDTO.add(new NonEECertificateDTO(certificate));
+        }
+        return new ResponseEntity<>(nonEECertificatesDTO, HttpStatus.OK);
+    }
+
     private void saveMasterKey(){
         String masterKey = aesUtils.generateMasterKey();
         String encryptedMasterKey = aesUtils.encrypt(masterKey);
@@ -83,6 +122,7 @@ public class CertificateController {
 //        AdminMasterKey adminMasterKey = new AdminMasterKey(null, encryptedMasterKey);
 //        adminMasterKeyService.saveMasterKey(adminMasterKey);
     }
+
 
     private void getMasterKey(){
         AdminMasterKey adminMasterKey = adminMasterKeyService.getMasterKey();
